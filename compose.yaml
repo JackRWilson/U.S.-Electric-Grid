@@ -1,0 +1,29 @@
+services:
+  db:
+    build: ./db
+    hostname: db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  # airflow:
+  #   image: apache/airflow:latest-python3.12
+  #   container_name: airflow
+  #   hostname: airflow
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - EIA_API_KEY: ${EIA_API_KEY}
+  #     - AIRFLOW_CONN_ELECTRICITY_PG: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_DATABASE}
+  #   command: airflow standalone
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - ./dags:/opt/airflow/dags
+
+volumes:
+  pgdata:
