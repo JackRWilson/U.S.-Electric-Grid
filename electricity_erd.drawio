@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="L91bxDY7ZIvhGEccVjsO" name="Page-1">
-        <mxGraphModel dx="1743" dy="1206" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="938" dy="1206" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -65,7 +65,7 @@
                 <mxCell id="KLFhLKF9QyvM0a0x-2aX-20" parent="KLFhLKF9QyvM0a0x-2aX-19" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
                     <mxGeometry height="140" width="160" y="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="KLFhLKF9QyvM0a0x-2aX-21" parent="KLFhLKF9QyvM0a0x-2aX-20" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;pointerEvents=1;" value="&lt;div&gt;&lt;b&gt;generation_id PK&lt;/b&gt;&lt;/div&gt;&lt;div&gt;ba_id FK&lt;/div&gt;&lt;div&gt;period&lt;/div&gt;&lt;div&gt;fuel_type_id FK&lt;/div&gt;&lt;div&gt;generation_megawatthours&lt;/div&gt;" vertex="1">
+                <mxCell id="KLFhLKF9QyvM0a0x-2aX-21" parent="KLFhLKF9QyvM0a0x-2aX-20" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;pointerEvents=1;" value="&lt;div&gt;&lt;b&gt;generation_id PK&lt;/b&gt;&lt;/div&gt;&lt;div&gt;ba_id FK&lt;/div&gt;&lt;div&gt;period&lt;/div&gt;&lt;div&gt;fuel_type_id FK&lt;/div&gt;&lt;div&gt;generation_mwh&lt;/div&gt;" vertex="1">
                     <mxGeometry height="140" width="160" as="geometry">
                         <mxRectangle height="140" width="160" as="alternateBounds"/>
                     </mxGeometry>
@@ -145,6 +145,9 @@
                 </mxCell>
                 <mxCell id="KLFhLKF9QyvM0a0x-2aX-48" edge="1" parent="1" source="KLFhLKF9QyvM0a0x-2aX-11" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERone;endFill=0;startArrow=ERmany;startFill=0;" target="KLFhLKF9QyvM0a0x-2aX-23">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="kKVM38qoX8sK55h9lZdo-1" edge="1" parent="1" source="KLFhLKF9QyvM0a0x-2aX-5" style="edgeStyle=entityRelationEdgeStyle;html=1;entryX=0.983;entryY=0.264;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="KLFhLKF9QyvM0a0x-2aX-11">
+                    <mxGeometry relative="1" x="-0.0029" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

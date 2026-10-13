@@ -81,8 +81,8 @@ Project process is as follows (subject to change)
 ## ETL Prep
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Create ERD | 1 hr | |
-| Create schema | 1 hr | |
+| Create ERD | 1 hr | 1:30 hrs |
+| Create schema | 1 hr | 45 min |
 | Set up Airflow | 15 min | |
 | Set up DB engine | 10 min | |
 | Total | 2:25 hrs | |
