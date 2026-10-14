@@ -6,3 +6,4 @@ pyarrow
 dynaconf
 sqlalchemy
 psycopg[binary]
+openpyxl

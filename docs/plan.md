@@ -42,6 +42,15 @@ https://www.census.gov/data/tables/time-series/demo/popest/2020s-total-cities-an
 Household Income Data
 https://dqydj.com/2025-income-by-city/
 
+FIPS Data
+https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2020.html#list-tab-264479560
+
+BA Data
+https://data.catalyst.coop/preview/pudl/out_eia861__yearly_balancing_authority_service_territory
+
+EIA Industry Report Data
+https://www.eia.gov/electricity/data/eia861/
+
 Flow: EIA call > filter so only need respondent-codes from Plant that are in EIA > get lat/long from the remaining cords > Weather call with cords 
 
 
@@ -84,13 +93,13 @@ Project process is as follows (subject to change)
 | Create ERD | 1 hr | 1:30 hrs |
 | Create schema | 1 hr | 45 min |
 | Set up Airflow | 15 min | |
-| Set up DB engine | 10 min | |
+| Set up DB engine | 10 min | 1 hr |
 | Total | 2:25 hrs | |
 
 ## Extract
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Extract data from sites | 1 hr | |
+| Extract data from sites | 1 hr | 12:40 hrs |
 | Load in raw data | 30 min | |
 | Total | 1:30 hrs | |
 
