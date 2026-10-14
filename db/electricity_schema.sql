@@ -2,20 +2,15 @@ drop schema if exists electricity cascade;
 create schema electricity;
 set search_path to electricity;
 
-create table state (
-	state_id serial primary key,
-	state_abbrev varchar(5) not null unique
-);
-
-create table city (
-	city_id serial primary key,
-	state_id int not null
-        references state(state_id),
-    city_name varchar(100) not null,
-    est_population int,
-    avg_household_income int,
-    median_household_income int,
-    unique (state_id, city_name)
+create table county (
+    county_id serial primary key,
+	fips_code char(5) unique not null,
+	state_abbrev char(2) not null,
+    state_name varchar(50) not null,
+    county_name varchar(100) not null,
+    est_population_2025 int,
+    personal_income_total int,
+    personal_income_per_capita int
 );
 
 create table balancing_authority (
@@ -35,7 +30,7 @@ create table electric_demand (
     ba_id int not null
         references balancing_authority(ba_id),
     "period" timestamp not null,
-    demand_mwh int not null,
+    demand_mwh int,
     net_generation_mwh int,
     total_interchange_mwh int,
     unique (ba_id, "period")
@@ -52,40 +47,26 @@ create table electric_generation(
     unique (ba_id, "period", fuel_type_id)
 );
 
-create table ba_city (
-    ba_city_id serial primary key,
+create table ba_county (
+    ba_county_id serial primary key,
     ba_id int not null
         references balancing_authority(ba_id),
-    city_id int not null
-        references city(city_id),
-    "weight" numeric(8,6) not null,
-    unique (ba_id, city_id)
+    county_id int not null
+        references county(county_id),
+    unique (ba_id, county_id)
 );
 
-create table plant (
-    plant_id serial primary key,
-    city_id int
-        references city(city_id),
-    ba_id int not null
-        references balancing_authority(ba_id),
-    latitude numeric(9,6),
-    longitude numeric(9,6),
-    plant_name varchar(100)
-);
-
-create table plant_fuel_type (
-    plant_fuel_type_id serial primary key,
-    fuel_type_id int not null
-        references fuel_type(fuel_type_id),
-    plant_id int not null
-        references plant(plant_id),
-    unique (plant_id, fuel_type_id)
+create table weather_location (
+    weather_location_id serial primary key,
+    latitude numeric(5,2) not null,
+    longitude numeric(5,2) not null,
+    unique(latitude, longitude)
 );
 
 create table weather (
     weather_id serial primary key,
-    plant_id int not null
-        references plant(plant_id),
+    weather_location_id int not null
+        references weather_location(weather_location_id),
     "period" timestamp not null,
     temp numeric(5,2),
     precipitation numeric(8,3),
@@ -99,5 +80,14 @@ create table weather (
     wind_speed_120m numeric(5,2),
     wind_speed_180m numeric(5,2),
     wind_gusts_10m numeric(5,2),
-    unique (plant_id, "period")
+    unique (weather_location_id, "period")
+);
+
+create table ba_weather_location (
+    ba_weather_location_id serial primary key,
+    ba_id int not null
+        references balancing_authority(ba_id),
+    weather_location_id int not null
+        references weather_location(weather_location_id),
+    weather_weight numeric (9,8) not null
 );
