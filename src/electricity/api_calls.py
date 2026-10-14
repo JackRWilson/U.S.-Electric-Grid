@@ -1,8 +1,7 @@
-import requests
 import pandas as pd
-from utils import print_progress_bar
-from urllib3.util.retry import Retry
+import requests
 from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 def _build_session():
@@ -42,10 +41,8 @@ class ExtractAPI:
                 break
 
             all_rows.extend(rows)
-            print_progress_bar(len(all_rows), total)
 
             if len(all_rows) >= total:
-                print()
                 break
             params["offset"] += len(rows)
 
