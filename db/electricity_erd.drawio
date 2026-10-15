@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="L91bxDY7ZIvhGEccVjsO" name="Page-1">
-        <mxGraphModel dx="1169" dy="1206" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1733" dy="1206" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,7 +10,7 @@
                 <mxCell id="KLFhLKF9QyvM0a0x-2aX-5" parent="KLFhLKF9QyvM0a0x-2aX-4" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
                     <mxGeometry height="140" width="173" y="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="KLFhLKF9QyvM0a0x-2aX-6" parent="KLFhLKF9QyvM0a0x-2aX-5" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;pointerEvents=1;" value="&lt;div&gt;&lt;b&gt;county_id PK&lt;/b&gt;&lt;/div&gt;&lt;div&gt;fips_code&lt;/div&gt;&lt;div&gt;state_abbrev&lt;/div&gt;&lt;div&gt;state_name&lt;/div&gt;&lt;div&gt;county_name&lt;/div&gt;&lt;div&gt;est_population_2025&lt;/div&gt;&lt;div&gt;personal_income_total&lt;/div&gt;&lt;div&gt;personal_income_per_capita&lt;/div&gt;" vertex="1">
+                <mxCell id="KLFhLKF9QyvM0a0x-2aX-6" parent="KLFhLKF9QyvM0a0x-2aX-5" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;pointerEvents=1;" value="&lt;div&gt;&lt;b&gt;county_id PK&lt;/b&gt;&lt;/div&gt;&lt;div&gt;fips_code&lt;/div&gt;&lt;div&gt;state_abbrev&lt;/div&gt;&lt;div&gt;state_name&lt;/div&gt;&lt;div&gt;county_name&lt;/div&gt;&lt;div&gt;est_population_2024&lt;/div&gt;&lt;div&gt;personal_income_total&lt;/div&gt;&lt;div&gt;personal_income_per_capita&lt;/div&gt;" vertex="1">
                     <mxGeometry height="140" width="173" as="geometry">
                         <mxRectangle height="140" width="173" as="alternateBounds"/>
                     </mxGeometry>

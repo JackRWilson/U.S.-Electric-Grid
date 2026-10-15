@@ -8,7 +8,7 @@ create table county (
 	state_abbrev char(2) not null,
     state_name varchar(50) not null,
     county_name varchar(100) not null,
-    est_population_2025 int,
+    est_population_2024 int,
     personal_income_total int,
     personal_income_per_capita int
 );
