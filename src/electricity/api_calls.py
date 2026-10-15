@@ -1,3 +1,5 @@
+import time
+
 import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
@@ -49,4 +51,13 @@ class ExtractAPI:
         return pd.DataFrame(all_rows)
 
     def get_weather_data(self, url, params):
-        return self._request(url, params).json()
+        for attempt in range(3):
+            response = self._request(url, params)
+            try:
+                return response.json()
+            except requests.exceptions.JSONDecodeError as exc:
+                if attempt == 2:
+                    raise RuntimeError(
+                        "Weather API returned invalid JSON after 3 attempts"
+                    ) from exc
+                time.sleep(2**attempt)

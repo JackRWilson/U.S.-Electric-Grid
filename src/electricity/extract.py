@@ -11,7 +11,7 @@ from utils import STATE_NAMES, AGG_RESPONDENTS
 BASE_URL = "https://api.eia.gov/v2/electricity/rto"
 DEMAND_URL = f"{BASE_URL}/region-data/data/"
 GENERATION_URL = f"{BASE_URL}/fuel-type-data/data/"
-WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
+WEATHER_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 
 CACHE_DIR = Path("../../data/cache")
 
@@ -38,6 +38,7 @@ def incremental_extract(
     else:
         cached_data = None
         start = default_start
+    out_data = cached_data if cached_data is not None else pd.DataFrame()
     now = datetime.now(UTC).replace(tzinfo=None)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -47,11 +48,7 @@ def incremental_extract(
         new_data = extract_function(chunk_start, chunk_end)
 
         if not new_data.empty:
-            if cached_data is None:
-                out_data = new_data
-            else:
-                out_data = pd.concat([cached_data, new_data], ignore_index=True)
-
+            out_data = pd.concat([out_data, new_data], ignore_index=True)
             out_data = (
                 out_data.drop_duplicates(subset=dup_subset_keys, keep="last")
                 .sort_values(time_col)
@@ -62,7 +59,7 @@ def incremental_extract(
 
         chunk_start = chunk_end
 
-    return out_data if out_data is not None else pd.DataFrame()
+    return out_data
 
 
 class ExtractEIA(ExtractAPI):

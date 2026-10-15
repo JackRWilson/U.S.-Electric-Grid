@@ -10,7 +10,7 @@ from extract import (
     ExtractParquet,
     ExtractWeather,
 )
-from utils import AGG_RESPONDENTS, STATE_ABBREV, status_print
+from utils import AGG_RESPONDENTS, STATE_ABBREV, WEATHER_CODES, status_print
 
 
 class TransformCounty:
@@ -148,6 +148,26 @@ class TransformWeatherLoc:
         return df[["latitude", "longitude"]].drop_duplicates()
 
 
+class TransformWeather:
+    def transform(self, df):
+        df = self._map_weather_codes(df)
+        df = self._rename_columns(df)
+        return df
+
+    def _map_weather_codes(self, df):
+        df["weather_code"] = df["weather_code"].map(WEATHER_CODES)
+        return df
+
+    def _rename_columns(self, df):
+        return df.rename(
+            columns={
+                "time": "period",
+                "temperature_2m": "temp",
+                "cloud_cover": "total_cloud_cover",
+            }
+        )
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -211,6 +231,7 @@ class ETLProcessor:
         ba_table = TransformBA().transform(demand_df)
         fuel_type_table = TransformFuelType().transform(generation_df)
         weather_loc_table = TransformWeatherLoc().transform(ba_points_df)
+        weather_table = TransformWeather().transform(weather_df)
         status_print("Transforming tables", True)
 
-        print(weather_loc_table.head())
+        print(weather_table.head())
