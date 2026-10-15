@@ -125,6 +125,21 @@ class TransformBA:
         )
 
 
+class TransformFuelType:
+    def transform(self, df):
+        df = self._drop_duplicates(df)
+        df = self._rename_cols(df)
+        return df
+
+    def _drop_duplicates(self, df):
+        return df[["fueltype", "type-name"]].drop_duplicates()
+
+    def _rename_cols(self, df):
+        return df.rename(
+            columns={"fueltype": "fuel_type_code", "type-name": "fuel_type_name"}
+        )
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -186,6 +201,7 @@ class ETLProcessor:
         status_print("Transforming tables")
         county_table = TransformCounty().transform(ba_points_df, coord_df, pop_inc_df)
         ba_table = TransformBA().transform(demand_df)
+        fuel_type_table = TransformFuelType().transform(generation_df)
         status_print("Transforming tables", True)
 
-        print(ba_table.head())
+        print(fuel_type_table.head())

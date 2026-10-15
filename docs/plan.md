@@ -108,7 +108,7 @@ Project process is as follows (subject to change)
 | ---- | --------- | --------- |
 | Transform county data | 2 hrs | 6:20 hrs |
 | Transform ba data | 30 min | 40 min |
-| Transform fuel data | 30 min | |
+| Transform fuel data | 30 min | 15 min |
 | Transform demand data | 2 hrs | |
 | Transform generation data | 2 hrs | |
 | Transform ba county data | 30 min | |
