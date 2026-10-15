@@ -13,13 +13,13 @@ def run():
     paths = ETLPaths(
         plant_data_path=Path("../../data/2___Plant_Y2025.xlsx"),
         generator_data_path=Path("../../data/3_1_Generator_Y2025.xlsx"),
-        income_data_path=Path("../../data/city-income-est.csv"),
         pop_data_path=Path("../../data/sub-est2025.csv"),
         ba_data_path=Path("../../data/Balancing_Authority_2025.xlsx"),
         coord_data_path=Path("../../data/2020_Gaz_counties_national.txt"),
         ba_county_data_path=Path(
             "../../data/out_eia861__yearly_balancing_authority_service_territory.parquet"
         ),
+        pop_inc_data_path=Path("../../data/CAINC1__ALL_AREAS_1969_2024.csv"),
     )
 
     def build_engine():
