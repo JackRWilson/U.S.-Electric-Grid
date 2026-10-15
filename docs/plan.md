@@ -112,10 +112,10 @@ Project process is as follows (subject to change)
 | Transform demand data | 2 hrs | |
 | Transform generation data | 2 hrs | |
 | Transform ba county data | 30 min | |
-| Transform weather location data | 12hr | |
+| Transform weather location data | 1 hr | 20 min |
 | Transform weather data | 30 min | |
 | Transform ba location data | 30 min | |
-| Total | 4 hrs | |
+| Total | 9:30 hrs | |
 
 ## Load
 | Task | Est. Time | Act. Time |

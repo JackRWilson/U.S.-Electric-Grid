@@ -140,6 +140,14 @@ class TransformFuelType:
         )
 
 
+class TransformWeatherLoc:
+    def transform(self, df):
+        return self._drop_duplicates(df)
+
+    def _drop_duplicates(self, df):
+        return df[["latitude", "longitude"]].drop_duplicates()
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -202,6 +210,7 @@ class ETLProcessor:
         county_table = TransformCounty().transform(ba_points_df, coord_df, pop_inc_df)
         ba_table = TransformBA().transform(demand_df)
         fuel_type_table = TransformFuelType().transform(generation_df)
+        weather_loc_table = TransformWeatherLoc().transform(ba_points_df)
         status_print("Transforming tables", True)
 
-        print(fuel_type_table.head())
+        print(weather_loc_table.head())
