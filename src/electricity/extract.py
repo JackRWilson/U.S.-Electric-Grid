@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 from api_calls import ExtractAPI
-from utils import STATE_NAMES
+from utils import STATE_NAMES, AGG_RESPONDENTS
 
 BASE_URL = "https://api.eia.gov/v2/electricity/rto"
 DEMAND_URL = f"{BASE_URL}/region-data/data/"
@@ -146,22 +146,6 @@ class ExtractParquet:
 class BALocations:
     GRID_STEP = 0.25
     TOP_N = 3
-    AGG_RESPONDENTS = (
-        "California",
-        "Southwest",
-        "Carolinas",
-        "Northwest",
-        "Central",
-        "Southeast",
-        "Tennessee",
-        "Texas",
-        "Florida",
-        "Mid-Atlantic",
-        "Midwest",
-        "New England",
-        "New York",
-        "United States Lower 48",
-    )
 
     def __init__(self, respondents_df, ba_df, coord_df, ba_county_df, plant_df, pop_df):
         self._respondents_df = respondents_df
@@ -285,7 +269,7 @@ class BALocations:
         pop = pop[["GEOID", "POPESTIMATE2025"]]
 
         missing = all_respondents[
-            ~all_respondents["respondent-name"].isin(self.AGG_RESPONDENTS)
+            ~all_respondents["respondent-name"].isin(AGG_RESPONDENTS)
             & all_respondents["latitude"].isna()
         ]
 

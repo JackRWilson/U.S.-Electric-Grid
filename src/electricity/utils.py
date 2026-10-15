@@ -60,6 +60,23 @@ STATE_NAMES = {
 
 STATE_ABBREV = {name: abbrev for abbrev, name in STATE_NAMES.items()}
 
+AGG_RESPONDENTS = (
+    "California",
+    "Southwest",
+    "Carolinas",
+    "Northwest",
+    "Central",
+    "Southeast",
+    "Tennessee",
+    "Texas",
+    "Florida",
+    "Mid-Atlantic",
+    "Midwest",
+    "New England",
+    "New York",
+    "United States Lower 48",
+)
+
 
 def status_print(message, complete=False):
     if complete:

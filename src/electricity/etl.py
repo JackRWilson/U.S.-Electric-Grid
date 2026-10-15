@@ -10,7 +10,7 @@ from extract import (
     ExtractParquet,
     ExtractWeather,
 )
-from utils import STATE_ABBREV, status_print
+from utils import AGG_RESPONDENTS, STATE_ABBREV, status_print
 
 
 class TransformCounty:
@@ -109,6 +109,22 @@ class TransformCounty:
         return df
 
 
+class TransformBA:
+    def transform(self, df):
+        df = self._drop_duplicates(df)
+        df = self._rename_cols(df)
+        return df
+
+    def _drop_duplicates(self, df):
+        df = df[["respondent", "respondent-name"]].drop_duplicates()
+        return df[~df["respondent-name"].isin(AGG_RESPONDENTS)]
+
+    def _rename_cols(self, df):
+        return df.rename(
+            columns={"respondent": "ba_code", "respondent-name": "ba_name"}
+        )
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -165,9 +181,11 @@ class ETLProcessor:
         weather_df = weather.extract_weather(coordinates_df)
         status_print("Extracting weather API", True)
 
-        # --------------------------------------------------1
+        # --------------------------------------------------
 
-        status_print("Transforming county table")
+        status_print("Transforming tables")
         county_table = TransformCounty().transform(ba_points_df, coord_df, pop_inc_df)
-        print(county_table.head())
-        status_print("Transforming county table", True)
+        ba_table = TransformBA().transform(demand_df)
+        status_print("Transforming tables", True)
+
+        print(ba_table.head())
