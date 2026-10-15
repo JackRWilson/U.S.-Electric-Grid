@@ -132,8 +132,10 @@ class ExtractExcel:
 
 
 class ExtractCSV:
-    def extract(self, data_path, encoding="utf-8", delimiter=","):
-        return pd.read_csv(data_path, encoding=encoding, delimiter=delimiter)
+    def extract(self, data_path, encoding="utf-8", delimiter=",", low_memory=True):
+        return pd.read_csv(
+            data_path, encoding=encoding, delimiter=delimiter, low_memory=low_memory
+        )
 
 
 class ExtractParquet:
