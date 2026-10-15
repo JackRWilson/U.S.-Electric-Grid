@@ -13,3 +13,7 @@ data/2___Plant_Y2025.xlsx
 data/3_1_Generator_Y2025.xlsx
 data/sub-est2025.csv
 data/CAINC1__ALL_AREAS_1969_2024.csv
+
+# Dev/Testing
+/notebooks
+logs.txt
