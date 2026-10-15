@@ -20,9 +20,6 @@ https://www.eia.gov/electricity/data/eia860/
 Population Data
 https://www.census.gov/data/tables/time-series/demo/popest/2020s-total-cities-and-towns.html
 
-Household Income Data
-https://dqydj.com/2025-income-by-city/
-
 Geo Data
 https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2020.html#list-tab-264479560
 

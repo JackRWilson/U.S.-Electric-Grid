@@ -39,9 +39,6 @@ https://www.eia.gov/electricity/data/eia860/
 Population Data
 https://www.census.gov/data/tables/time-series/demo/popest/2020s-total-cities-and-towns.html
 
-Household Income Data
-https://dqydj.com/2025-income-by-city/
-
 FIPS Data
 https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2020.html#list-tab-264479560
 
@@ -50,6 +47,9 @@ https://data.catalyst.coop/preview/pudl/out_eia861__yearly_balancing_authority_s
 
 EIA Industry Report Data
 https://www.eia.gov/electricity/data/eia861/
+
+County Population Data
+https://apps.bea.gov/regional/downloadzip.htm
 
 Flow: EIA call > filter so only need respondent-codes from Plant that are in EIA > get lat/long from the remaining cords > Weather call with cords 
 
@@ -106,10 +106,15 @@ Project process is as follows (subject to change)
 ## Transform
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Transform electricity data | 2 hrs | |
-| Transform weather data | 1 hr | |
-| Transform population data | 30 min | |
-| Transform income data | 30 min | |
+| Transform county data | 2 hrs | 6:20 hrs |
+| Transform ba data | 30 min | |
+| Transform fuel data | 30 min | |
+| Transform demand data | 2 hrs | |
+| Transform generation data | 2 hrs | |
+| Transform ba county data | 30 min | |
+| Transform weather location data | 12hr | |
+| Transform weather data | 30 min | |
+| Transform ba location data | 30 min | |
 | Total | 4 hrs | |
 
 ## Load
