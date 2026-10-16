@@ -109,11 +109,11 @@ Project process is as follows (subject to change)
 | Transform county data | 2 hrs | 6:20 hrs |
 | Transform ba data | 30 min | 40 min |
 | Transform fuel data | 30 min | 15 min |
-| Transform demand data | 2 hrs | |
+| Transform demand data | 2 hrs | 1 hr |
 | Transform generation data | 2 hrs | |
 | Transform ba county data | 30 min | |
 | Transform weather location data | 1 hr | 20 min |
-| Transform weather data | 30 min | |
+| Transform weather data | 30 min | 2:15 hrs |
 | Transform ba location data | 30 min | |
 | Total | 9:30 hrs | |
 

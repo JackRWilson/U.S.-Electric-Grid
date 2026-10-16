@@ -151,14 +151,14 @@ class TransformWeatherLoc:
 class TransformWeather:
     def transform(self, df):
         df = self._map_weather_codes(df)
-        df = self._rename_columns(df)
+        df = self._rename_cols(df)
         return df
 
     def _map_weather_codes(self, df):
         df["weather_code"] = df["weather_code"].map(WEATHER_CODES)
         return df
 
-    def _rename_columns(self, df):
+    def _rename_cols(self, df):
         return df.rename(
             columns={
                 "time": "period",
@@ -166,6 +166,79 @@ class TransformWeather:
                 "cloud_cover": "total_cloud_cover",
             }
         )
+
+
+class TransformDemand:
+    def transform(self, df):
+        df = self._pivot_metrics(df)
+        df = self._impute_missing_values(df)
+        df = self._rename_cols(df)
+        df = self._convert_dtypes(df)
+        return df
+
+    def _pivot_metrics(self, df):
+        df = df[["period", "respondent", "type-name", "value"]]
+        df = df.pivot(
+            index=["period", "respondent"], columns="type-name", values="value"
+        ).reset_index()
+        return df
+
+    def _impute_missing_values(self, df):
+        condition = (df["Net generation"] == df["Total interchange"]) & (
+            df["Demand"].isna()
+        )
+        df.loc[condition, "Demand"] = 0
+
+        condition = (df["Demand"] == df["Total interchange"]) & (
+            df["Net generation"].isna()
+        )
+        df.loc[condition, "Net generation"] = 0
+
+        condition = (
+            df["Net generation"].notna()
+            & df["Total interchange"].notna()
+            & df["Demand"].isna()
+        )
+        df.loc[condition, "Demand"] = (
+            df.loc[condition, "Net generation"] - df.loc[condition, "Total interchange"]
+        )
+
+        condition = (
+            df["Net generation"].isna()
+            & df["Total interchange"].notna()
+            & df["Demand"].notna()
+        )
+        df.loc[condition, "Net generation"] = (
+            df.loc[condition, "Demand"] + df.loc[condition, "Total interchange"]
+        )
+
+        condition = (
+            df["Net generation"].notna()
+            & df["Total interchange"].isna()
+            & df["Demand"].notna()
+        )
+        df.loc[condition, "Total interchange"] = (
+            df.loc[condition, "Demand"] - df.loc[condition, "Net generation"]
+        )
+        return df
+
+    def _rename_cols(self, df):
+        df = df.rename(
+            columns={
+                "Demand": "demand_mwh",
+                "Net generation": "net_generation_mwh",
+                "Total interchange": "total_interchange_mwh",
+                "respondent": "ba_code",
+            }
+        )
+        df.columns.name = None
+        return df
+
+    def _convert_dtypes(self, df):
+        cols = ["demand_mwh", "net_generation_mwh", "total_interchange_mwh"]
+        for col in cols:
+            df[col] = df[col].astype("Int64")
+        return df
 
 
 @dataclass
@@ -231,7 +304,12 @@ class ETLProcessor:
         ba_table = TransformBA().transform(demand_df)
         fuel_type_table = TransformFuelType().transform(generation_df)
         weather_loc_table = TransformWeatherLoc().transform(ba_points_df)
-        weather_table = TransformWeather().transform(weather_df)
+        weather_table = TransformWeather().transform(
+            weather_df
+        )  # Still needs weather_location_id on lat, long
+        demand_table = TransformDemand().transform(
+            demand_df
+        )  # Still needs ba_id on ba_code
         status_print("Transforming tables", True)
 
-        print(weather_table.head())
+        print(demand_table.head())
