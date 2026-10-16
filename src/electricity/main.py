@@ -12,7 +12,6 @@ def run():
 
     paths = ETLPaths(
         plant_data_path=Path("../../data/2___Plant_Y2025.xlsx"),
-        generator_data_path=Path("../../data/3_1_Generator_Y2025.xlsx"),
         pop_data_path=Path("../../data/sub-est2025.csv"),
         ba_data_path=Path("../../data/Balancing_Authority_2025.xlsx"),
         coord_data_path=Path("../../data/2020_Gaz_counties_national.txt"),

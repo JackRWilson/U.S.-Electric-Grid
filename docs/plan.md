@@ -85,7 +85,7 @@ Project process is as follows (subject to change)
 | Collect all data sources | 1 hr | 1:30 hrs |
 | Create questions | 30 min | 10 min |
 | Create project plan | 1 hr | 30 min |
-| Total | 3:30 hrs | |
+| Total | 3:30 hrs | 3:40 hrs |
 
 ## ETL Prep
 | Task | Est. Time | Act. Time |
@@ -100,8 +100,7 @@ Project process is as follows (subject to change)
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
 | Extract data from sites | 1 hr | 12:40 hrs |
-| Load in raw data | 30 min | |
-| Total | 1:30 hrs | |
+| Total | 1:30 hrs | 12:40 hrs |
 
 ## Transform
 | Task | Est. Time | Act. Time |
@@ -110,12 +109,12 @@ Project process is as follows (subject to change)
 | Transform ba data | 30 min | 40 min |
 | Transform fuel data | 30 min | 15 min |
 | Transform demand data | 2 hrs | 1 hr |
-| Transform generation data | 2 hrs | |
-| Transform ba county data | 30 min | |
+| Transform generation data | 2 hrs | 10 min |
+| Transform ba county data | 30 min | 40 min |
 | Transform weather location data | 1 hr | 20 min |
 | Transform weather data | 30 min | 2:15 hrs |
 | Transform ba location data | 30 min | 15 min |
-| Total | 9:30 hrs | |
+| Total | 9:30 hrs | 11:55 hrs |
 
 ## Load
 | Task | Est. Time | Act. Time |

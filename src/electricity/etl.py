@@ -284,10 +284,23 @@ class TransformBACounty:
         return df
 
 
+class TransformGeneration:
+    def transform(self, df):
+        return self._rename_cols(df)
+
+    def _rename_cols(self, df):
+        return df[["period", "respondent", "fueltype", "value"]].rename(
+            columns={
+                "respondent": "ba_code",
+                "fueltype": "fuel_type_code",
+                "value": "generation_mwh",
+            }
+        )
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
-    generator_data_path: Path
     pop_data_path: Path
     ba_data_path: Path
     coord_data_path: Path
@@ -314,7 +327,6 @@ class ETLProcessor:
 
         status_print("Extracting local files")
         plant_df = excel.extract(self._paths.plant_data_path)
-        generator_df = excel.extract(self._paths.generator_data_path)
         ba_df = excel.extract(self._paths.ba_data_path, skiprows=0)
         pop_df = csv.extract(self._paths.pop_data_path, encoding="latin-1")
         coord_df = csv.extract(
@@ -353,6 +365,9 @@ class ETLProcessor:
         ba_county_table = TransformBACounty().transform(
             ba_points_df, coord_df
         )  # Still needs ba_id on ba_code and county_id on fips_code
+        generation_table = TransformGeneration().transform(
+            generation_df
+        )  # Still needs ba_id on ba_code and fuel_type_id on fuel_type_code
         status_print("Transforming tables", True)
 
-        print(ba_county_table.head())
+        print(generation_table.head())
