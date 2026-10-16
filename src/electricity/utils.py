@@ -108,10 +108,3 @@ WEATHER_CODES = {
     97: "Heavy thunderstorm",
     99: "Thunderstorm with heavy hail",
 }
-
-
-def status_print(message, complete=False):
-    if complete:
-        print(f"\r{message}... Complete.")
-    else:
-        print(f"{message}...", end="", flush=True)
