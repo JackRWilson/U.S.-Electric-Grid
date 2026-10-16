@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import os
 import time
 from datetime import UTC, datetime, timedelta
@@ -13,10 +14,16 @@ DEMAND_URL = f"{BASE_URL}/region-data/data/"
 GENERATION_URL = f"{BASE_URL}/fuel-type-data/data/"
 WEATHER_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 
-CACHE_DIR = Path("../../data/cache")
+CACHE_DIR = Path(
+    os.environ.get(
+        "ELECTRICITY_CACHE_DIR",
+        Path(__file__).resolve().parents[2] / "data" / "cache",
+    )
+)
 
 LOOK_BACK = timedelta(days=90)
 HR_FORMAT = "%Y-%m-%dT%H"
+logger = logging.getLogger(__name__)
 
 
 def incremental_extract(
@@ -25,6 +32,7 @@ def incremental_extract(
     dup_subset_keys,
     time_col,
     default_start,
+    requested_start=None,
     overlap=timedelta(hours=20),
     chunk=timedelta(days=7),
     refresh=False,
@@ -34,28 +42,45 @@ def incremental_extract(
         cached_data = pd.read_parquet(cache_path)
 
     if cached_data is not None and not cached_data.empty:
-        start = cached_data[time_col].max() - overlap
+        start = (
+            requested_start
+            if requested_start is not None
+            else cached_data[time_col].max() - overlap
+        )
     else:
         cached_data = None
-        start = default_start
+        start = requested_start if requested_start is not None else default_start
     out_data = cached_data if cached_data is not None else pd.DataFrame()
     now = datetime.now(UTC).replace(tzinfo=None)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
     chunk_start = start
+    chunk_count = 0
     while chunk_start < now:
         chunk_end = min(chunk_start + chunk, now)
+        chunk_count += 1
+        logger.info(
+            "Fetching API chunk %d (%s to %s)",
+            chunk_count,
+            chunk_start,
+            chunk_end,
+        )
         new_data = extract_function(chunk_start, chunk_end)
+        logger.info(
+            "API chunk %d returned %s rows",
+            chunk_count,
+            f"{len(new_data):,}",
+        )
 
-        if not new_data.empty:
+        if not new_data.empty or out_data.empty:
             out_data = pd.concat([out_data, new_data], ignore_index=True)
-            out_data = (
-                out_data.drop_duplicates(subset=dup_subset_keys, keep="last")
-                .sort_values(time_col)
-                .reset_index(drop=True)
-            )
-
-            out_data.to_parquet(cache_path, index=False)
+            if not out_data.empty:
+                out_data = (
+                    out_data.drop_duplicates(subset=dup_subset_keys, keep="last")
+                    .sort_values(time_col)
+                    .reset_index(drop=True)
+                )
+                out_data.to_parquet(cache_path, index=False)
 
         chunk_start = chunk_end
 
@@ -77,6 +102,18 @@ class ExtractEIA(ExtractAPI):
         return params
 
     def _clean(self, df):
+        if df.empty:
+            return df.reindex(
+                columns=[
+                    "period",
+                    "respondent",
+                    "respondent-name",
+                    "type",
+                    "type-name",
+                    "fueltype",
+                    "value",
+                ]
+            )
         df["period"] = pd.to_datetime(df["period"])
         df["value"] = pd.to_numeric(df["value"])
         return df
@@ -98,6 +135,7 @@ class ExtractEIA(ExtractAPI):
             dup_subset_keys=["period", "respondent", "type"],
             time_col="period",
             default_start=default_start,
+            requested_start=start,
             refresh=refresh,
         )
 
@@ -118,6 +156,7 @@ class ExtractEIA(ExtractAPI):
             dup_subset_keys=["period", "respondent", "fueltype"],
             time_col="period",
             default_start=default_start,
+            requested_start=start,
             chunk=timedelta(days=3),
             refresh=refresh,
         )
@@ -383,6 +422,7 @@ class ExtractWeather(ExtractAPI):
             dup_subset_keys=["latitude", "longitude", "time"],
             time_col="time",
             default_start=default_start,
+            requested_start=start,
             chunk=self.TIME_CHUNK,
             refresh=refresh,
         )
