@@ -31,9 +31,7 @@ class TransformCounty:
         return df
 
     def _map_state_abbrev(self, df):
-        df["state_abbrev"] = df["state_name"].map(
-            lambda state: STATE_ABBREV.get(state, state)
-        )
+        df["state_abbrev"] = df["state_name"].map(STATE_ABBREV)
         return df
 
     def _merge_fips_code(self, df, fips_df):
@@ -251,6 +249,41 @@ class TransformBAWeatherLoc:
         return df
 
 
+class TransformBACounty:
+    def transform(self, ba_points_df, coord_df):
+        df = self._map_state_abbrev(ba_points_df)
+        df = self._isolate_state_county(df)
+        df = self._merge_fips_code(df, coord_df)
+        return df
+
+    def _map_state_abbrev(self, df):
+        df["state_abbrev"] = df["state_name"].map(STATE_ABBREV)
+        df = df[["respondent", "county_name", "state_abbrev"]]
+        return df
+
+    def _isolate_state_county(self, df):
+        df["county_name"] = df["county_name"].str.split("; ")
+        df = df.explode("county_name").reset_index(drop=True)
+        return df
+
+    def _merge_fips_code(self, df, fips_df):
+        fips_df.columns = fips_df.columns.str.strip()
+        fips_df["GEOID"] = fips_df["GEOID"].astype(str).str.zfill(5)
+        fips_df = fips_df[["USPS", "NAME", "GEOID"]]
+        fips_df = fips_df.rename(
+            columns={
+                "USPS": "state_abbrev",
+                "GEOID": "fips_code",
+                "NAME": "county_name",
+            }
+        )
+        df = df.merge(fips_df, on=["state_abbrev", "county_name"], how="left")[
+            ["respondent", "fips_code"]
+        ].rename(columns={"respondent": "ba_code"})
+
+        return df
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -279,13 +312,10 @@ class ETLProcessor:
         generation_df = eia.extract_generation()
         status_print("Extracting EIA API", True)
 
-        status_print("Extracting Excel")
+        status_print("Extracting local files")
         plant_df = excel.extract(self._paths.plant_data_path)
         generator_df = excel.extract(self._paths.generator_data_path)
         ba_df = excel.extract(self._paths.ba_data_path, skiprows=0)
-        status_print("Extracting Excel", True)
-
-        status_print("Extracting CSV")
         pop_df = csv.extract(self._paths.pop_data_path, encoding="latin-1")
         coord_df = csv.extract(
             self._paths.coord_data_path, encoding="utf-8", delimiter="\t"
@@ -293,11 +323,8 @@ class ETLProcessor:
         pop_inc_df = csv.extract(
             self._paths.pop_inc_data_path, encoding="latin-1", low_memory=False
         )
-        status_print("Extracting CSV", True)
-
-        status_print("Extracting parquet")
         ba_county_df = parq.extract(self._paths.ba_county_data_path)
-        status_print("Extracting parquet", True)
+        status_print("Extracting local files", True)
 
         status_print("Extracting weather API")
         locations = BALocations(
@@ -323,6 +350,9 @@ class ETLProcessor:
         ba_weather_loc_table = TransformBAWeatherLoc().transform(
             ba_points_df
         )  # Still needs ba_id on ba_code and weather_loc_id on lat, long
+        ba_county_table = TransformBACounty().transform(
+            ba_points_df, coord_df
+        )  # Still needs ba_id on ba_code and county_id on fips_code
         status_print("Transforming tables", True)
 
-        print(ba_weather_loc_table.head())
+        print(ba_county_table.head())
