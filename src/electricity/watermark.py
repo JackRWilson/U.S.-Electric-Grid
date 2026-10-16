@@ -47,4 +47,4 @@ class ETLWatermark:
         newest = pd.to_datetime(df[col].max())
         newest = newest.to_pydatetime()
         if pd.notna(newest):
-            self._load_watermark(source, newest)
+            self.load(source, newest)
