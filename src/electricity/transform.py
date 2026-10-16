@@ -114,6 +114,8 @@ class TransformBA:
         ba_df = ba_df.rename(
             columns={"BA Code": "ba_code", "Balancing Authority Name": "ba_name"}
         )
+        df["ba_code"] = df["ba_code"].astype(object)
+        ba_df["ba_code"] = ba_df["ba_code"].astype(object)
         return df, ba_df
 
     def _merge_dfs(self, df, ba_df):
