@@ -114,7 +114,7 @@ Project process is as follows (subject to change)
 | Transform ba county data | 30 min | |
 | Transform weather location data | 1 hr | 20 min |
 | Transform weather data | 30 min | 2:15 hrs |
-| Transform ba location data | 30 min | |
+| Transform ba location data | 30 min | 15 min |
 | Total | 9:30 hrs | |
 
 ## Load

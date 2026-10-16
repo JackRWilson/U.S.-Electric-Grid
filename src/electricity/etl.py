@@ -241,6 +241,16 @@ class TransformDemand:
         return df
 
 
+class TransformBAWeatherLoc:
+    def transform(self, df):
+        return self._rename_filter_cols(df)
+
+    def _rename_filter_cols(self, df):
+        df = df[["respondent", "latitude", "longitude", "weather_weight"]]
+        df = df.rename(columns={"respondent": "ba_code"})
+        return df
+
+
 @dataclass
 class ETLPaths:
     plant_data_path: Path
@@ -310,6 +320,9 @@ class ETLProcessor:
         demand_table = TransformDemand().transform(
             demand_df
         )  # Still needs ba_id on ba_code
+        ba_weather_loc_table = TransformBAWeatherLoc().transform(
+            ba_points_df
+        )  # Still needs ba_id on ba_code and weather_loc_id on lat, long
         status_print("Transforming tables", True)
 
-        print(demand_table.head())
+        print(ba_weather_loc_table.head())
