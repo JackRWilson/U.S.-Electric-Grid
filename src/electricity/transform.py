@@ -97,19 +97,30 @@ class TransformCounty:
 
 
 class TransformBA:
-    def transform(self, df):
-        df = self._drop_duplicates(df)
-        df = self._rename_cols(df)
+    def transform(self, df, ba_df):
+        df, ba_df = self._drop_duplicates(df, ba_df)
+        df, ba_df = self._rename_cols(df, ba_df)
+        df = self._merge_dfs(df, ba_df)
         return df
 
-    def _drop_duplicates(self, df):
+    def _drop_duplicates(self, df, ba_df):
         df = df[["respondent", "respondent-name"]].drop_duplicates()
-        return df[~df["respondent-name"].isin(AGG_RESPONDENTS)]
+        df = df[~df["respondent-name"].isin(AGG_RESPONDENTS)]
+        ba_df = ba_df[["BA Code", "Balancing Authority Name"]]
+        return df, ba_df
 
-    def _rename_cols(self, df):
-        return df.rename(
-            columns={"respondent": "ba_code", "respondent-name": "ba_name"}
+    def _rename_cols(self, df, ba_df):
+        df = df.rename(columns={"respondent": "ba_code", "respondent-name": "ba_name"})
+        ba_df = ba_df.rename(
+            columns={"BA Code": "ba_code", "Balancing Authority Name": "ba_name"}
         )
+        return df, ba_df
+
+    def _merge_dfs(self, df, ba_df):
+        df = df.merge(ba_df, on="ba_code", how="outer", suffixes=("_demand", "_ba"))
+        df["ba_name"] = df["ba_name_demand"].combine_first(df["ba_name_ba"])
+        df = df.drop(columns=["ba_name_demand", "ba_name_ba"]).drop_duplicates()
+        return df
 
 
 class TransformFuelType:
@@ -155,13 +166,27 @@ class TransformWeather:
         )
 
 
+class TransformBAWeatherLoc:
+    def transform(self, df):
+        return self._rename_filter_cols(df)
+
+    def _rename_filter_cols(self, df):
+        df = df[["respondent", "latitude", "longitude", "weather_weight"]]
+        df = df.rename(columns={"respondent": "ba_code"})
+        return df
+
+
 class TransformDemand:
     def transform(self, df):
+        df = self._drop_aggregate_bas(df)
         df = self._pivot_metrics(df)
         df = self._impute_missing_values(df)
         df = self._rename_cols(df)
         df = self._convert_dtypes(df)
         return df
+
+    def _drop_aggregate_bas(self, df):
+        return df[~df["respondent-name"].isin(AGG_RESPONDENTS)]
 
     def _pivot_metrics(self, df):
         df = df[["period", "respondent", "type-name", "value"]]
@@ -228,14 +253,23 @@ class TransformDemand:
         return df
 
 
-class TransformBAWeatherLoc:
+class TransformGeneration:
     def transform(self, df):
-        return self._rename_filter_cols(df)
-
-    def _rename_filter_cols(self, df):
-        df = df[["respondent", "latitude", "longitude", "weather_weight"]]
-        df = df.rename(columns={"respondent": "ba_code"})
+        df = self._drop_aggregate_bas(df)
+        df = self._rename_cols(df)
         return df
+
+    def _drop_aggregate_bas(self, df):
+        return df[~df["respondent-name"].isin(AGG_RESPONDENTS)]
+
+    def _rename_cols(self, df):
+        return df[["period", "respondent", "fueltype", "value"]].rename(
+            columns={
+                "respondent": "ba_code",
+                "fueltype": "fuel_type_code",
+                "value": "generation_mwh",
+            }
+        )
 
 
 class TransformBACounty:
@@ -271,17 +305,3 @@ class TransformBACounty:
         ].rename(columns={"respondent": "ba_code"})
 
         return df
-
-
-class TransformGeneration:
-    def transform(self, df):
-        return self._rename_cols(df)
-
-    def _rename_cols(self, df):
-        return df[["period", "respondent", "fueltype", "value"]].rename(
-            columns={
-                "respondent": "ba_code",
-                "fueltype": "fuel_type_code",
-                "value": "generation_mwh",
-            }
-        )
