@@ -25,37 +25,6 @@ create table fuel_type (
     fuel_type_name varchar(100) not null
 );
 
-create table electric_demand (
-    electric_demand_id serial primary key,
-    ba_id int not null
-        references balancing_authority(ba_id),
-    "period" timestamp not null,
-    demand_mwh int,
-    net_generation_mwh int,
-    total_interchange_mwh int,
-    unique (ba_id, "period")
-);
-
-create table electric_generation(
-    electric_generation_id serial primary key,
-    ba_id int not null
-        references balancing_authority(ba_id),
-    "period" timestamp not null,
-    fuel_type_id int not null
-        references fuel_type(fuel_type_id),
-    generation_mwh int,
-    unique (ba_id, "period", fuel_type_id)
-);
-
-create table ba_county (
-    ba_county_id serial primary key,
-    ba_id int not null
-        references balancing_authority(ba_id),
-    county_id int not null
-        references county(county_id),
-    unique (ba_id, county_id)
-);
-
 create table weather_location (
     weather_location_id serial primary key,
     latitude numeric(5,2) not null,
@@ -91,3 +60,37 @@ create table ba_weather_location (
         references weather_location(weather_location_id),
     weather_weight numeric (9,8) not null
 );
+
+create table electric_demand (
+    electric_demand_id serial primary key,
+    ba_id int not null
+        references balancing_authority(ba_id),
+    "period" timestamp not null,
+    demand_mwh int,
+    net_generation_mwh int,
+    total_interchange_mwh int,
+    unique (ba_id, "period")
+);
+
+create table electric_generation(
+    electric_generation_id serial primary key,
+    ba_id int not null
+        references balancing_authority(ba_id),
+    "period" timestamp not null,
+    fuel_type_id int not null
+        references fuel_type(fuel_type_id),
+    generation_mwh int,
+    unique (ba_id, "period", fuel_type_id)
+);
+
+create table ba_county (
+    ba_county_id serial primary key,
+    ba_id int not null
+        references balancing_authority(ba_id),
+    county_id int not null
+        references county(county_id),
+    unique (ba_id, county_id)
+);
+
+
+

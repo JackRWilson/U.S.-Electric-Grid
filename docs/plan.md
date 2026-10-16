@@ -120,7 +120,7 @@ Project process is as follows (subject to change)
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
 | Load transformed data into DB | 3 hrs | |
-| Total | 3 hrs | |
+| Total | 3 hrs | 1:50 hrs |
 
 ## App
 | Task | Est. Time | Act. Time |

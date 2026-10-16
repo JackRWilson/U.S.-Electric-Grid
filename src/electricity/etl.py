@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-import pandas as pd
 from extract import *
+from load import *
 from transform import *
 from utils import status_print
 
@@ -60,29 +60,33 @@ class ETLProcessor:
 
         status_print("Transforming tables")
         county_table = TransformCounty().transform(ba_points_df, coord_df, pop_inc_df)
-        ba_table = TransformBA().transform(demand_df)
+        ba_table = TransformBA().transform(demand_df, ba_df)
         fuel_type_table = TransformFuelType().transform(generation_df)
         weather_loc_table = TransformWeatherLoc().transform(ba_points_df)
-        weather_table = TransformWeather().transform(
-            weather_df
-        )  # Still needs weather_location_id on lat, long
-        demand_table = TransformDemand().transform(
-            demand_df
-        )  # Still needs ba_id on ba_code
-        ba_weather_loc_table = TransformBAWeatherLoc().transform(
-            ba_points_df
-        )  # Still needs ba_id on ba_code and weather_loc_id on lat, long
-        ba_county_table = TransformBACounty().transform(
-            ba_points_df, coord_df
-        )  # Still needs ba_id on ba_code and county_id on fips_code
-        generation_table = TransformGeneration().transform(
-            generation_df
-        )  # Still needs ba_id on ba_code and fuel_type_id on fuel_type_code
+        weather_table = TransformWeather().transform(weather_df)
+        ba_weather_loc_table = TransformBAWeatherLoc().transform(ba_points_df)
+        demand_table = TransformDemand().transform(demand_df)
+        generation_table = TransformGeneration().transform(generation_df)
+        ba_county_table = TransformBACounty().transform(ba_points_df, coord_df)
         status_print("Transforming tables", True)
 
         # --------------------------------------------------
-        
+
         status_print("Loading tables")
-        
+        load_county = LoadCounties(self._conn)
+        load_ba = LoadBa(self._conn)
+        load_fuel_type = LoadFuelType(self._conn)
+        load_weather_loc = LoadWeatherLoc(self._conn)
+
+        county_db = load_county.load(county_table)
+        ba_db = load_ba.load(ba_table)
+        fuel_type_db = load_fuel_type.load(fuel_type_table)
+        weather_loc_db = load_weather_loc.load(weather_loc_table)
+        LoadWeather(self._conn).load(weather_table, weather_loc_db)
+        LoadBAWeatherLoc(self._conn).load(ba_weather_loc_table, ba_db, weather_loc_db)
+        LoadDemand(self._conn).load(demand_table, ba_db)
+        LoadGeneration(self._conn).load(generation_table, ba_db, fuel_type_db)
+        LoadBACounty(self._conn).load(ba_county_table, ba_db, county_db)
         status_print("Loading tables", True)
+
         print("ETL Complete.")
