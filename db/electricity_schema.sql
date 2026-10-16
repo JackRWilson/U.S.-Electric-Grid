@@ -92,5 +92,7 @@ create table ba_county (
     unique (ba_id, county_id)
 );
 
-
-
+create table etl_watermark (
+    source varchar(50) primary key,
+    last_period timestamp
+);
