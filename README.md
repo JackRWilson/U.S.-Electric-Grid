@@ -16,7 +16,7 @@ Create a .env file with API and DB credentials using the format in .env.example.
 ```yaml
 EIA_API_KEY=eia_api_key # Required 
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_USER=your_username # Required 
 DB_PASSWORD=your_password # Required 
 DB_DATABASE=your_db # Required 
@@ -38,10 +38,12 @@ Delete to use defaults.
 
 ## Airflow
 Open Docker and navigate to the project directory.
+
 Build the container.
 ```powershell
 docker compose up -d --build
 ```
+
 Copy Airflow username and password. {user, password}
 ```powershell
 docker exec -it airflow /bin/bash
@@ -51,11 +53,15 @@ cat simple_auth_manager_passwords.json.generated
 ```
 
 Open http://localhost:8080/ and enter credentials.
-Enable `electricity_etl_dag` or trigger manually. The first run will take a while.
+
+Enable `electricity_etl_dag` or trigger manually. The first run will take a while (~1.5 hours). The DAG will run hourly after that.
+
+You can view tables by creating a connection with your `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`, and `DB_PORT` 5433.
 
 ### Manual
 Open a terminal and navigate to the project directory.
-Create a virtual environment and activate it, and install requirements.
+
+Create a virtual environment and activate it.
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1

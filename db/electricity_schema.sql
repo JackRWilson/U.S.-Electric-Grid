@@ -1,8 +1,7 @@
-drop schema if exists electricity cascade;
-create schema electricity;
+create schema if not exists electricity;
 set search_path to electricity;
 
-create table county (
+create table if not exists county (
     county_id serial primary key,
 	fips_code char(5) unique not null,
 	state_abbrev char(2) not null,
@@ -13,26 +12,26 @@ create table county (
     personal_income_per_capita int
 );
 
-create table balancing_authority (
+create table if not exists balancing_authority (
     ba_id serial primary key,
     ba_code varchar(20) not null unique,
     ba_name varchar(200) not null
 );
 
-create table fuel_type (
+create table if not exists fuel_type (
     fuel_type_id serial primary key,
     fuel_type_code varchar(10) not null unique,
     fuel_type_name varchar(100) not null
 );
 
-create table weather_location (
+create table if not exists weather_location (
     weather_location_id serial primary key,
     latitude numeric(5,2) not null,
     longitude numeric(5,2) not null,
     unique(latitude, longitude)
 );
 
-create table weather (
+create table if not exists weather (
     weather_id serial primary key,
     weather_location_id int not null
         references weather_location(weather_location_id),
@@ -52,16 +51,17 @@ create table weather (
     unique (weather_location_id, "period")
 );
 
-create table ba_weather_location (
+create table if not exists ba_weather_location (
     ba_weather_location_id serial primary key,
     ba_id int not null
         references balancing_authority(ba_id),
     weather_location_id int not null
         references weather_location(weather_location_id),
-    weather_weight numeric (9,8) not null
+    weather_weight numeric (9,8) not null,
+    unique (ba_id, weather_location_id)
 );
 
-create table electric_demand (
+create table if not exists electric_demand (
     electric_demand_id serial primary key,
     ba_id int not null
         references balancing_authority(ba_id),
@@ -72,7 +72,7 @@ create table electric_demand (
     unique (ba_id, "period")
 );
 
-create table electric_generation(
+create table if not exists electric_generation(
     electric_generation_id serial primary key,
     ba_id int not null
         references balancing_authority(ba_id),
@@ -83,7 +83,7 @@ create table electric_generation(
     unique (ba_id, "period", fuel_type_id)
 );
 
-create table ba_county (
+create table if not exists ba_county (
     ba_county_id serial primary key,
     ba_id int not null
         references balancing_authority(ba_id),
@@ -92,7 +92,7 @@ create table ba_county (
     unique (ba_id, county_id)
 );
 
-create table etl_watermark (
+create table if not exists etl_watermark (
     source varchar(50) primary key,
     last_period timestamp
 );

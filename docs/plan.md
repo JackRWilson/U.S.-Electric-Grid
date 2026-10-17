@@ -92,15 +92,15 @@ Project process is as follows (subject to change)
 | ---- | --------- | --------- |
 | Create ERD | 1 hr | 1:30 hrs |
 | Create schema | 1 hr | 45 min |
-| Set up Airflow | 15 min | |
+| Set up Airflow | 15 min | 6:30 hrs |
 | Set up DB engine | 10 min | 1 hr |
-| Total | 2:25 hrs | |
+| Total | 2:25 hrs | 9:45 hrs |
 
 ## Extract
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
 | Extract data from sites | 1 hr | 12:40 hrs |
-| Total | 1:30 hrs | 12:40 hrs |
+| Total | 1 hr | 12:40 hrs |
 
 ## Transform
 | Task | Est. Time | Act. Time |

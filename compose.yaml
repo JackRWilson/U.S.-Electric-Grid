@@ -10,20 +10,35 @@ services:
       - ${DB_PORT}:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
-  # airflow:
-  #   image: apache/airflow:latest-python3.12
-  #   container_name: airflow
-  #   hostname: airflow
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - EIA_API_KEY: ${EIA_API_KEY}
-  #     - AIRFLOW_CONN_ELECTRICITY_PG: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_DATABASE}
-  #   command: airflow standalone
-  #   ports:
-  #     - 8080:8080
-  #   volumes:
-  #     - ./dags:/opt/airflow/dags
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  airflow:
+    build: ./airflow
+    image: electricity-airflow:latest
+    container_name: airflow
+    hostname: airflow
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      EIA_API_KEY: ${EIA_API_KEY}
+      AIRFLOW_CONN_ELECTRICITY_PG: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_DATABASE}
+      EIA_INITIAL_START: ${EIA_INITIAL_START:-}
+      WEATHER_INITIAL_START: ${WEATHER_INITIAL_START:-}
+      ELECTRICITY_CACHE_DIR: /opt/airflow/cache
+    command: standalone
+    ports:
+      - 8080:8080
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src/electricity:/opt/airflow/src/electricity:ro
+      - ./data:/opt/airflow/data:ro
+      - ./db:/opt/airflow/db:ro
+      - etl_cache:/opt/airflow/cache
 
 volumes:
   pgdata:
+  etl_cache:
