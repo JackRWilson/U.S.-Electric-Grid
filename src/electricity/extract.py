@@ -32,6 +32,7 @@ def incremental_extract(
     dup_subset_keys,
     time_col,
     default_start,
+    source_name,
     requested_start=None,
     overlap=timedelta(hours=20),
     chunk=timedelta(days=7),
@@ -54,22 +55,27 @@ def incremental_extract(
     now = datetime.now(UTC).replace(tzinfo=None)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
+    source_started = time.monotonic()
     chunk_start = start
     chunk_count = 0
     while chunk_start < now:
         chunk_end = min(chunk_start + chunk, now)
         chunk_count += 1
         logger.info(
-            "Fetching API chunk %d (%s to %s)",
+            "Fetching %s API chunk %d (%s to %s)",
+            source_name,
             chunk_count,
             chunk_start,
             chunk_end,
         )
+        chunk_started = time.monotonic()
         new_data = extract_function(chunk_start, chunk_end)
         logger.info(
-            "API chunk %d returned %s rows",
+            "%s API chunk %d returned %s rows in %.1f seconds",
+            source_name,
             chunk_count,
             f"{len(new_data):,}",
+            time.monotonic() - chunk_started,
         )
 
         if not new_data.empty or out_data.empty:
@@ -80,10 +86,24 @@ def incremental_extract(
                     .sort_values(time_col)
                     .reset_index(drop=True)
                 )
+                cache_started = time.monotonic()
                 out_data.to_parquet(cache_path, index=False)
+                logger.info(
+                    "%s cache write completed in %.1f seconds (%s cached rows)",
+                    source_name,
+                    time.monotonic() - cache_started,
+                    f"{len(out_data):,}",
+                )
 
         chunk_start = chunk_end
 
+    logger.info(
+        "%s extraction finished: %d chunks, %s cached rows, %.1f seconds total",
+        source_name,
+        chunk_count,
+        f"{len(out_data):,}",
+        time.monotonic() - source_started,
+    )
     return out_data
 
 
@@ -135,6 +155,7 @@ class ExtractEIA(ExtractAPI):
             dup_subset_keys=["period", "respondent", "type"],
             time_col="period",
             default_start=default_start,
+            source_name="EIA demand",
             requested_start=start,
             refresh=refresh,
         )
@@ -156,6 +177,7 @@ class ExtractEIA(ExtractAPI):
             dup_subset_keys=["period", "respondent", "fueltype"],
             time_col="period",
             default_start=default_start,
+            source_name="EIA generation",
             requested_start=start,
             chunk=timedelta(days=3),
             refresh=refresh,
@@ -378,6 +400,12 @@ class ExtractWeather(ExtractAPI):
             "start_date": since.strftime("%Y-%m-%d"),
             "end_date": until.strftime("%Y-%m-%d"),
         }
+        logger.info(
+            "Fetching Open-Meteo weather for %d locations (%s to %s)",
+            len(batch),
+            since,
+            until,
+        )
         payload = self.get_weather_data(WEATHER_URL, params)
         if isinstance(payload, dict):
             payload = [payload]
@@ -404,10 +432,17 @@ class ExtractWeather(ExtractAPI):
 
         def extract(since, until):
             frames = []
-            for i in range(0, len(coords), self.LOCATION_BATCH):
+            batches = range(0, len(coords), self.LOCATION_BATCH)
+            for batch_number, i in enumerate(batches, start=1):
                 batch = coords[i : i + self.LOCATION_BATCH]
+                logger.info(
+                    "Open-Meteo location batch %d/%d",
+                    batch_number,
+                    (len(coords) + self.LOCATION_BATCH - 1) // self.LOCATION_BATCH,
+                )
                 frames.append(self._fetch_batch(batch, since, until))
-                time.sleep(self.SLEEP)
+                if i + self.LOCATION_BATCH < len(coords):
+                    time.sleep(self.SLEEP)
 
             return self._clean(pd.concat(frames, ignore_index=True))
 
@@ -422,6 +457,7 @@ class ExtractWeather(ExtractAPI):
             dup_subset_keys=["latitude", "longitude", "time"],
             time_col="time",
             default_start=default_start,
+            source_name="Open-Meteo weather",
             requested_start=start,
             chunk=self.TIME_CHUNK,
             refresh=refresh,
