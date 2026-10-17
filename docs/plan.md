@@ -39,8 +39,17 @@ https://www.eia.gov/electricity/data/eia860/
 Population Data
 https://www.census.gov/data/tables/time-series/demo/popest/2020s-total-cities-and-towns.html
 
-Household Income Data
-https://dqydj.com/2025-income-by-city/
+FIPS Data
+https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2020.html#list-tab-264479560
+
+BA Data
+https://data.catalyst.coop/preview/pudl/out_eia861__yearly_balancing_authority_service_territory
+
+EIA Industry Report Data
+https://www.eia.gov/electricity/data/eia861/
+
+County Population Data
+https://apps.bea.gov/regional/downloadzip.htm
 
 Flow: EIA call > filter so only need respondent-codes from Plant that are in EIA > get lat/long from the remaining cords > Weather call with cords 
 
@@ -76,38 +85,42 @@ Project process is as follows (subject to change)
 | Collect all data sources | 1 hr | 1:30 hrs |
 | Create questions | 30 min | 10 min |
 | Create project plan | 1 hr | 30 min |
-| Total | 3:30 hrs | |
+| Total | 3:30 hrs | 3:40 hrs |
 
 ## ETL Prep
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
 | Create ERD | 1 hr | 1:30 hrs |
 | Create schema | 1 hr | 45 min |
-| Set up Airflow | 15 min | |
-| Set up DB engine | 10 min | |
-| Total | 2:25 hrs | |
+| Set up Airflow | 15 min | 6:30 hrs |
+| Set up DB engine | 10 min | 1 hr |
+| Total | 2:25 hrs | 9:45 hrs |
 
 ## Extract
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Extract data from sites | 1 hr | |
-| Load in raw data | 30 min | |
-| Total | 1:30 hrs | |
+| Extract data from sites | 1 hr | 12:40 hrs |
+| Total | 1 hr | 12:40 hrs |
 
 ## Transform
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Transform electricity data | 2 hrs | |
-| Transform weather data | 1 hr | |
-| Transform population data | 30 min | |
-| Transform income data | 30 min | |
-| Total | 4 hrs | |
+| Transform county data | 2 hrs | 6:20 hrs |
+| Transform ba data | 30 min | 40 min |
+| Transform fuel data | 30 min | 15 min |
+| Transform demand data | 2 hrs | 1 hr |
+| Transform generation data | 2 hrs | 10 min |
+| Transform ba county data | 30 min | 40 min |
+| Transform weather location data | 1 hr | 20 min |
+| Transform weather data | 30 min | 2:15 hrs |
+| Transform ba location data | 30 min | 15 min |
+| Total | 9:30 hrs | 11:55 hrs |
 
 ## Load
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
 | Load transformed data into DB | 3 hrs | |
-| Total | 3 hrs | |
+| Total | 3 hrs | 1:50 hrs |
 
 ## App
 | Task | Est. Time | Act. Time |

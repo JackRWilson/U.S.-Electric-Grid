@@ -1,0 +1,9 @@
+requests
+python-dotenv
+pandas
+ipykernel
+pyarrow
+dynaconf
+sqlalchemy
+psycopg[binary]
+openpyxl
