@@ -125,7 +125,7 @@ Project process is as follows (subject to change)
 ## App
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Sketch up possible app view | 1 hr | |
+| Sketch up possible app view | 1 hr | 2:55 hrs |
 | Load data tables in | 3 hrs | |
 | Create electricity generation section | 2 hrs | |
 | Create electricty demand section | 2 hr | |
