@@ -100,25 +100,26 @@ def pipeline_ba_map():
 # National picture tab - KPIs
 def nat_pic_kpis():
     sql = """
-    with generation as (
+    with latest_period as (
+        select max(eg.period) as period
+        from electric_generation eg
+        inner join electric_demand ed on ed.period = eg.period
+    ),
+    generation as (
         select
             eg.period,	
             sum(generation_mwh) as total_generation_mwh
         from electric_generation eg
-        inner join electric_demand ed on ed.period = eg.period
+        inner join latest_period lp on lp.period = eg.period
         group by eg.period
-        order by eg.period desc
-        limit 1
     ),
     demand as (
         select
             ed.period,	
             sum(demand_mwh) as total_demand_mwh
         from electric_demand ed
-        inner join electric_generation eg on eg.period = ed.period
+        inner join latest_period lp on lp.period = ed.period
         group by ed.period
-        order by ed.period desc
-        limit 1
     ),
     fuel as (
         select
@@ -126,26 +127,22 @@ def nat_pic_kpis():
             sum(generation_mwh) as total_generation_mwh,
             ft.fuel_type_name
         from electric_generation eg
-        inner join electric_demand ed on ed.period = eg.period
-        join fuel_type ft on ft.fuel_type_id = eg.fuel_type_id
-        where eg.period = (
-            select max(eg.period)
-            from electric_generation eg
-            inner join electric_demand ed on ed.period = eg.period
-            )
+        inner join latest_period lp on lp.period = eg.period
+        inner join fuel_type ft on ft.fuel_type_id = eg.fuel_type_id
         group by eg.period, ft.fuel_type_name
-        order by eg.period desc, total_generation_mwh desc
+        order by total_generation_mwh desc
         limit 1
     )
     select
-        demand.period,
+        latest_period.period,
         generation.total_generation_mwh,
         demand.total_demand_mwh,
         fuel.total_generation_mwh as gen_from_fuel,
         fuel.fuel_type_name
-    from demand
-    inner join generation on generation.period = demand.period
-    inner join fuel on fuel.period = demand.period
+    from latest_period
+    join generation on generation.period = latest_period.period
+    join demand on demand.period = latest_period.period
+    join fuel on fuel.period = latest_period.period
     """
     df = extract_data(sql)
 
