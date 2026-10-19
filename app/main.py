@@ -1,9 +1,5 @@
-from dash import Dash
+from init_app import app
 from layout import layout
-
-app = Dash(__name__)
-server = app.server
-
 
 app.layout = layout
 
