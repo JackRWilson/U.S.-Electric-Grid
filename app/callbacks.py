@@ -86,13 +86,13 @@ def update_demand_time_line_graph(selected_ba):
     )
 
     fig.add_trace(
-        go.Scatter(x=df["period"], y=df["temp"], name="Temperature (F)"),
+        go.Scatter(x=df["period"], y=df["temp"], name="Temperature (°F)"),
         secondary_y=True,
     )
 
     fig.update_xaxes(title_text="Time")
     fig.update_yaxes(title_text="Demand (MWh)", secondary_y=False)
-    fig.update_yaxes(title_text="Temperature (F)", secondary_y=True, showgrid=False)
+    fig.update_yaxes(title_text="Temperature (°F)", secondary_y=True, showgrid=False)
     fig.update_layout(
         title=f"Demand & Temp Over Time - {ba}",
         hovermode="x unified",
