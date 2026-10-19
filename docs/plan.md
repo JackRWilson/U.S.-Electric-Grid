@@ -130,7 +130,7 @@ Project process is as follows (subject to change)
 | Create data section | 3 hrs | 3:40 hrs |
 | Create pipeline section | 2 hrs | 2:55 hrs |
 | Create national picture section | 2 hrs | 1:10 hrs |
-| Create ba section | 4 hrs | |
+| Create ba section | 4 hrs | 2:15 hrs |
 | Create weather section | 4 hrs | |
 | Create prediction section | 5 hrs | |
 | Create income/population section | 3 hr | |
