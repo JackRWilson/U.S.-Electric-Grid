@@ -195,6 +195,15 @@ class TransformDemand:
         df = df.pivot(
             index=["period", "respondent"], columns="type-name", values="value"
         ).reset_index()
+        df = df.reindex(
+            columns=[
+                "period",
+                "respondent",
+                "Demand",
+                "Net generation",
+                "Total interchange",
+            ]
+        )
         return df
 
     def _impute_missing_values(self, df):
