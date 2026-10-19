@@ -1,6 +1,11 @@
 import callbacks  # noqa: F401
 from dash import dcc, html
-from graphs import pipeline_ba_map
+from graphs import (
+    nat_pic_demand_line_graph,
+    nat_pic_fuel_graph,
+    nat_pic_kpis,
+    pipeline_ba_map,
+)
 from init_app import app
 from inputs import data_ba_dropdown
 from tables import count_bas_covered, kpi_card, render_grid, render_table
@@ -9,6 +14,11 @@ from data import get_next_run_time, render_latest_completion
 
 
 def layout():
+    kpi_style = {
+        "display": "flex",
+        "gap": "16px",
+        "marginBottom": "16px",
+    }
 
     overview_tab = dcc.Tab(
         label="Overview",
@@ -54,6 +64,7 @@ def layout():
     method_tab = dcc.Tab(label="Methodology", disabled=True)
     data_tab = dcc.Tab(
         label="Data",
+        disabled=True,
         children=[
             html.Section(
                 [
@@ -118,11 +129,7 @@ def layout():
                                 "Total Demand", value_id="output-data-kpi-total-mwh"
                             ),
                         ],
-                        style={
-                            "display": "flex",
-                            "gap": "16px",
-                            "marginBottom": "16px",
-                        },
+                        style=kpi_style,
                     ),
                     data_ba_dropdown(),
                     dcc.Graph(id="output-demand-time-line-graph"),
@@ -153,6 +160,7 @@ def layout():
 
     pipeline_tab = dcc.Tab(
         label="Pipeline",
+        disabled=True,
         children=[
             html.Section(
                 [
@@ -165,11 +173,7 @@ def layout():
                             ),
                             kpi_card("Next Run", value=get_next_run_time()),
                         ],
-                        style={
-                            "display": "flex",
-                            "gap": "16px",
-                            "marginBottom": "16px",
-                        },
+                        style=kpi_style,
                     ),
                     html.H1("Pipeline Diagram"),
                     html.Img(
@@ -195,6 +199,32 @@ def layout():
             )
         ],
     )
+    grid_landscape_tab = dcc.Tab(label="Grid Landscape", disabled=True)
+    nationaL_pic_tab = dcc.Tab(
+        label="National Picture",
+        children=[
+            html.Section(
+                [
+                    html.H1("National Picture"),
+                    html.Section(
+                        [
+                            kpi_card("Most Recent Period", value=nat_pic_kpis()[0]),
+                            kpi_card("Total Generation", value=nat_pic_kpis()[1]),
+                            kpi_card("Total Demand", value=nat_pic_kpis()[2]),
+                            kpi_card("Primary Energy Source", value=nat_pic_kpis()[3]),
+                            kpi_card(
+                                f"Generation from {nat_pic_kpis()[3]}",
+                                value=nat_pic_kpis()[4],
+                            ),
+                        ],
+                        style=kpi_style,
+                    ),
+                    dcc.Graph(figure=nat_pic_demand_line_graph()),
+                    dcc.Graph(figure=nat_pic_fuel_graph()),
+                ]
+            )
+        ],
+    )
 
     layout = html.Div(
         [
@@ -202,7 +232,14 @@ def layout():
                 [
                     dcc.Tabs(
                         vertical=True,
-                        children=[overview_tab, method_tab, data_tab, pipeline_tab],
+                        children=[
+                            overview_tab,
+                            method_tab,
+                            data_tab,
+                            pipeline_tab,
+                            grid_landscape_tab,
+                            nationaL_pic_tab,
+                        ],
                     )
                 ]
             )
