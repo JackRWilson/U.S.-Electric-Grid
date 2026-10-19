@@ -127,7 +127,7 @@ Project process is as follows (subject to change)
 | ---- | --------- | --------- |
 | Sketch up possible app view | 1 hr | 2:55 hrs |
 | Create overview section | 30 min | 30 min |
-| Create data section | 3 hrs | |
+| Create data section | 3 hrs | 3:40 hrs |
 | Create pipeline section | 2 hrs | |
 | Create national picture section | 2 hrs | |
 | Create ba section | 4 hrs | |

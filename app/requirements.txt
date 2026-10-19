@@ -1,1 +1,6 @@
 dash
+pandas
+dynaconf
+sqlalchemy
+psycopg[binary]
+python-dotenv
