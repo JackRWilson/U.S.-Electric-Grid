@@ -209,4 +209,5 @@ class ETLProcessor:
         if is_first_run:
             self._watermark.load("static", None)
 
+        self._watermark.load_completed()
         logger.info("ETL complete")

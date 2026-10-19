@@ -41,6 +41,16 @@ class ETLWatermark:
         """
         self._conn.execute(text(sql), {"source": source, "period": period})
 
+    def load_completed(self):
+        sql = """
+        insert into electricity.etl_watermark
+            (source, last_period)
+        values ('etl', timezone('UTC', clock_timestamp()))
+        on conflict (source)
+        do update set last_period = excluded.last_period
+        """
+        self._conn.execute(text(sql))
+
     def load_max_period(self, source, df, col):
         if df.empty:
             return
