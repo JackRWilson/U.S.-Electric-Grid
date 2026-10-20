@@ -131,7 +131,7 @@ Project process is as follows (subject to change)
 | Create pipeline section | 2 hrs | 2:55 hrs |
 | Create national picture section | 2 hrs | 1:10 hrs |
 | Create ba section | 4 hrs | 2:15 hrs |
-| Create weather section | 4 hrs | |
+| Create weather section | 4 hrs | 5 hrs |
 | Create prediction section | 5 hrs | |
 | Create income/population section | 3 hr | |
 | App final touches | 2 hr | |

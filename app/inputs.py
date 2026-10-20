@@ -37,3 +37,25 @@ def ba_metric_dropdown():
         clearable=False,
         style={"width": "250px"},
     )
+
+
+# Data tab
+def weather_ba_dropdown():
+    sql = """
+    select distinct ba_code 
+    from electric_demand d
+    inner join balancing_authority ba on ba.ba_id = d.ba_id
+    union
+    select distinct ba_code 
+    from electric_generation g
+    inner join balancing_authority ba on ba.ba_id = g.ba_id
+    order by ba_code
+    """
+    df = extract_data(sql)
+    return dcc.Dropdown(
+        [{"label": name, "value": name} for name in df["ba_code"].unique()],
+        id="input-weather-ba-dropdown",
+        multi=False,
+        placeholder="All BAs",
+        style={"width": "250px"},
+    )

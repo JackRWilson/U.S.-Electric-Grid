@@ -7,7 +7,7 @@ from graphs import (
     pipeline_ba_map,
 )
 from init_app import app
-from inputs import data_ba_dropdown, ba_metric_dropdown
+from inputs import ba_metric_dropdown, data_ba_dropdown, weather_ba_dropdown
 from tables import count_bas_covered, kpi_card, render_grid, render_table
 
 from data import get_next_run_time, render_latest_completion
@@ -250,44 +250,87 @@ def layout():
     #         )
     #     ],
     # )
-    ba_tab = dcc.Tab(
-        label="Balancing Authorities",
+    # ba_tab = dcc.Tab(
+    #     label="Balancing Authorities",
+    #     style=tab_style,
+    #     selected_style=tab_selected_style,
+    #     children=[
+    #         html.Section(
+    #             [
+    #                 html.H1("Balancing Authorities"),
+    #                 html.P(
+    #                     """Balancing Authorities (BAs) are the organizations responsible for
+    #                        keeping electric supply and demand in balance within its region. Each
+    #                        BA forecasts demand for its region and directs the power plants within
+    #                        it to generate the right amount of electricity.
+    #                        """
+    #                 ),
+    #                 html.Section(
+    #                     [
+    #                         kpi_card(
+    #                             "Cleanest BA", value_id="output-ba-kpi-metric-cleanest"
+    #                         ),
+    #                         kpi_card(
+    #                             "Highest Avg Demand",
+    #                             value_id="output-ba-kpi-metric-demand",
+    #                         ),
+    #                         kpi_card(
+    #                             "Highest Avg Generation",
+    #                             value_id="output-ba-kpi-metric-gen",
+    #                         ),
+    #                         kpi_card("Metric Top", value_id="output-ba-kpi-metric-top"),
+    #                         kpi_card(
+    #                             "Metric Bottom", value_id="output-ba-kpi-metric-bottom"
+    #                         ),
+    #                     ],
+    #                     style=kpi_style,
+    #                 ),
+    #                 ba_metric_dropdown(),
+    #                 dcc.Graph(id="output-ba-metric-map"),
+    #                 dcc.Graph(id="output-ba-metric-bar"),
+    #             ]
+    #         )
+    #     ],
+    # )
+    weather_tab = dcc.Tab(
+        label="Weather",
         style=tab_style,
         selected_style=tab_selected_style,
         children=[
             html.Section(
                 [
-                    html.H1("Balancing Authorities"),
+                    html.H1("Weather"),
                     html.P(
-                        """Balancing Authorities (BAs) are the organizations responsible for
-                           keeping electric supply and demand in balance within its region. Each
-                           BA forecasts demand for its region and directs the power plants within
-                           it to generate the right amount of electricity. 
-                           """
+                        """Balance temperature looks at which temperature people use the least 
+                        amount of energy. If the balance temperature falls at the edge of the graph
+                        it is deemed invalid because there is no upward turn or 'U' shape.
+                        """
                     ),
                     html.Section(
                         [
                             kpi_card(
-                                "Cleanest BA", value_id="output-ba-kpi-metric-cleanest"
+                                "Average Temperature",
+                                value_id="output-weather-kpi-temp",
                             ),
                             kpi_card(
-                                "Highest Avg Demand",
-                                value_id="output-ba-kpi-metric-demand",
+                                "Balance Temperature",
+                                value_id="output-weather-kpi-balance",
                             ),
                             kpi_card(
-                                "Highest Avg Generation",
-                                value_id="output-ba-kpi-metric-gen",
+                                "Balance Demand",
+                                value_id="output-weather-kpi-bal-demand",
                             ),
-                            kpi_card("Metric Top", value_id="output-ba-kpi-metric-top"),
                             kpi_card(
-                                "Metric Bottom", value_id="output-ba-kpi-metric-bottom"
+                                "Average Demand",
+                                value_id="output-weather-kpi-demand",
                             ),
                         ],
                         style=kpi_style,
                     ),
-                    ba_metric_dropdown(),
-                    dcc.Graph(id="output-ba-metric-map"),
-                    dcc.Graph(id="output-ba-metric-bar"),
+                    weather_ba_dropdown(),
+                    dcc.Graph(id="output-weather-demand-scatter"),
+                    dcc.Graph(id="output-weather-code-bar"),
+                    dcc.Graph(id="output-weather-renewables-scatter"),
                 ]
             )
         ],
@@ -318,7 +361,8 @@ def layout():
                 # pipeline_tab,
                 grid_landscape_tab,
                 # national_pic_tab,
-                ba_tab,
+                # ba_tab,
+                weather_tab,
             ],
         )
     )
