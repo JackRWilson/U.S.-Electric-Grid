@@ -4,3 +4,4 @@ dynaconf
 sqlalchemy
 psycopg[binary]
 python-dotenv
+statsmodels

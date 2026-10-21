@@ -201,3 +201,112 @@ def nat_pic_fuel_graph():
         },
         title="Total Generation by Fuel",
     )
+
+
+# Pop and income tab - Demand, pop, income estimates
+def pop_inc_ba_data():
+    sql = """
+    with demand as (
+        select
+            ba_id,
+            avg(demand_mwh) as avg_demand_mw
+        from electric_demand
+        where demand_mwh > 0
+        group by ba_id
+    ),
+    demo as (
+        select
+            ba.ba_id,
+            ba.ba_code,
+            ba.ba_name,
+            sum(c.est_population_2024) as total_pop,
+            sum(c.personal_income_per_capita::numeric * c.est_population_2024)
+                / nullif(sum(c.est_population_2024), 0) as avg_income_per_capita
+        from county c
+        join ba_county bc on bc.county_id = c.county_id
+        join balancing_authority ba on ba.ba_id = bc.ba_id
+        group by ba.ba_id, ba.ba_code, ba.ba_name
+    )
+    select
+        demo.ba_code,
+        demo.ba_name,
+        demo.total_pop,
+        demo.avg_income_per_capita,
+        demand.avg_demand_mw,
+        demand.avg_demand_mw * 1000 / demo.total_pop as avg_demand_kw_per_person
+    from demand
+    join demo on demo.ba_id = demand.ba_id
+    where demo.total_pop >= 100000
+        and demo.avg_income_per_capita is not null
+    order by demo.ba_code;
+    """
+    return extract_data(sql)
+
+
+def pop_inc_scatter(x, title, x_label):
+    df = pop_inc_ba_data()
+    fig = px.scatter(
+        df,
+        x=x,
+        y="avg_demand_kw_per_person",
+        hover_name="ba_code",
+        hover_data=[
+            "ba_name",
+            "avg_demand_kw_per_person",
+            "total_pop",
+            "avg_income_per_capita",
+        ],
+        trendline="ols",
+        labels={
+            x: x_label,
+            "avg_demand_kw_per_person": "Avg Hourly Demand/Person (kW/person)",
+            "total_pop": "Population",
+            "avg_income_per_capita": "Income Per Capita ($)",
+        },
+        title=title,
+    )
+    demand_min = df["avg_demand_kw_per_person"].min()
+    demand_max = df["avg_demand_kw_per_person"].max()
+    demand_padding = max((demand_max - demand_min) * 0.08, demand_max * 0.03)
+    fig.update_yaxes(
+        range=[max(0, demand_min - demand_padding), demand_max + demand_padding],
+    )
+    fit = px.get_trendline_results(fig).iloc[0]["px_fit_results"]
+    return fig, fit
+
+
+def pop_inc_kpis():
+    _, population_fit = pop_inc_scatter(
+        x="total_pop",
+        title="Per-Person Demand vs. Population",
+        x_label="Population",
+    )
+    _, income_fit = pop_inc_scatter(
+        x="avg_income_per_capita",
+        title="Per-Person Demand vs. Income",
+        x_label="Population-weighted County Income Per Capita ($)",
+    )
+    return (
+        f"{income_fit.rsquared:.2f}",
+        f"{population_fit.rsquared:.2f}",
+        f"{income_fit.params[1] * 10_000 * 8.76:+,.3f} MWh/person/year",
+        f"{population_fit.params[1] * 100_000 * 8.76:+,.3f} MWh/person/year",
+    )
+
+
+def pop_inc_demand_pop_scatter():
+    fig, _ = pop_inc_scatter(
+        x="total_pop",
+        title="Per-Person Demand vs. Population",
+        x_label="Population",
+    )
+    return fig
+
+
+def pop_inc_demand_inc_scatter():
+    fig, _ = pop_inc_scatter(
+        x="avg_income_per_capita",
+        title="Per-Person Demand vs. Income",
+        x_label="Population-weighted County Income Per Capita ($)",
+    )
+    return fig

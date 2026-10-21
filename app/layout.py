@@ -5,6 +5,9 @@ from graphs import (
     nat_pic_fuel_graph,
     nat_pic_kpis,
     pipeline_ba_map,
+    pop_inc_demand_inc_scatter,
+    pop_inc_demand_pop_scatter,
+    pop_inc_kpis,
 )
 from init_app import app
 from inputs import ba_metric_dropdown, data_ba_dropdown, weather_ba_dropdown
@@ -292,47 +295,102 @@ def layout():
     #         )
     #     ],
     # )
-    weather_tab = dcc.Tab(
-        label="Weather",
+    # weather_tab = dcc.Tab(
+    #     label="Weather",
+    #     style=tab_style,
+    #     selected_style=tab_selected_style,
+    #     children=[
+    #         html.Section(
+    #             [
+    #                 html.H1("Weather"),
+    #                 html.P(
+    #                     """Balance temperature looks at which temperature people use the least
+    #                     amount of energy. If the balance temperature falls at the edge of the graph
+    #                     it is deemed invalid because there is no upward turn or 'U' shape.
+    #                     """
+    #                 ),
+    #                 html.Section(
+    #                     [
+    #                         kpi_card(
+    #                             "Average Temperature",
+    #                             value_id="output-weather-kpi-temp",
+    #                         ),
+    #                         kpi_card(
+    #                             "Balance Temperature",
+    #                             value_id="output-weather-kpi-balance",
+    #                         ),
+    #                         kpi_card(
+    #                             "Balance Demand",
+    #                             value_id="output-weather-kpi-bal-demand",
+    #                         ),
+    #                         kpi_card(
+    #                             "Average Demand",
+    #                             value_id="output-weather-kpi-demand",
+    #                         ),
+    #                     ],
+    #                     style=kpi_style,
+    #                 ),
+    #                 weather_ba_dropdown(),
+    #                 dcc.Graph(id="output-weather-demand-scatter"),
+    #                 dcc.Graph(id="output-weather-code-bar"),
+    #                 dcc.Graph(id="output-weather-renewables-scatter"),
+    #             ]
+    #         )
+    #     ],
+    # )
+    # demand_pred_tab = dcc.Tab(
+    #     label="Demand Prediction",
+    #     style=tab_style,
+    #     selected_style=tab_selected_style,
+    #     children=[
+    #         html.Section(
+    #             [
+    #                 html.H1("Demand Prediction"),
+    #                 html.P("""Build a small forecast model if time""")
+    #             ]
+    #         )
+    #     ],
+    # )
+
+    pop_income_tab = dcc.Tab(
+        label="Population & Income",
         style=tab_style,
         selected_style=tab_selected_style,
         children=[
             html.Section(
                 [
-                    html.H1("Weather"),
-                    html.P(
-                        """Balance temperature looks at which temperature people use the least 
-                        amount of energy. If the balance temperature falls at the edge of the graph
-                        it is deemed invalid because there is no upward turn or 'U' shape.
-                        """
-                    ),
+                    html.H1("Population & Income"),
+                    html.P("""
+                            Each point is a BA. Both charts use average hourly demand per
+                            person (kW/person). One compares it with estimated population
+                            of counties linked to that BA. The other compares population-weighted
+                            per capita income.
+                            """),
+                    html.P("""
+                            These are both approximate comparisons. With how large BAs service
+                            areas can be a single location, population, or income can't be mapped
+                            to it without some sort of aggregation. That being said, we can see
+                            there is little relationship between demand and population or income.
+                            """),
                     html.Section(
                         [
+                            kpi_card("Income R²", value=pop_inc_kpis()[0]),
+                            kpi_card("Population R²", value=pop_inc_kpis()[1]),
                             kpi_card(
-                                "Average Temperature",
-                                value_id="output-weather-kpi-temp",
+                                "Per-person annual change per +$10,000 income",
+                                value=pop_inc_kpis()[2],
                             ),
                             kpi_card(
-                                "Balance Temperature",
-                                value_id="output-weather-kpi-balance",
-                            ),
-                            kpi_card(
-                                "Balance Demand",
-                                value_id="output-weather-kpi-bal-demand",
-                            ),
-                            kpi_card(
-                                "Average Demand",
-                                value_id="output-weather-kpi-demand",
+                                "Per-person annual change per +100,000 population",
+                                value=pop_inc_kpis()[3],
                             ),
                         ],
                         style=kpi_style,
                     ),
-                    weather_ba_dropdown(),
-                    dcc.Graph(id="output-weather-demand-scatter"),
-                    dcc.Graph(id="output-weather-code-bar"),
-                    dcc.Graph(id="output-weather-renewables-scatter"),
-                ]
-            )
+                    dcc.Graph(figure=pop_inc_demand_pop_scatter()),
+                    dcc.Graph(figure=pop_inc_demand_inc_scatter()),
+                ],
+            ),
         ],
     )
 
@@ -362,7 +420,9 @@ def layout():
                 grid_landscape_tab,
                 # national_pic_tab,
                 # ba_tab,
-                weather_tab,
+                # weather_tab,
+                # demand_pred_tab,
+                pop_income_tab,
             ],
         )
     )
