@@ -1,10 +1,41 @@
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, callback, html
+from dash import ALL, Input, Output, callback, ctx, html, no_update
 from plotly.subplots import make_subplots
+from styles import (
+    BA_COLOR_BAR,
+    COLORS,
+    DATA_COLORS,
+    PLOTLY_AXIS_STYLE,
+    PLOTLY_LAYOUT_STYLE,
+)
+from tables import DATA_TABLES, render_table
 
-from data import extract_data
+from data import extract_data, get_temp_balance_number
+
+
+# Overview tab - Page navigation
+@callback(
+    Output(component_id="app-tabs", component_property="value"),
+    Input(
+        component_id={"type": "overview-tab-link", "index": ALL},
+        component_property="n_clicks",
+    ),
+    prevent_initial_call=True,
+)
+def navigate_from_overview(_clicks):
+    target_tab = {
+        "weather-forecast": "weather_tab",
+        "ba-area": "ba_tab",
+        "weather-renewables": "weather_tab",
+        "population": "pop_income_tab",
+        "income": "pop_income_tab",
+    }
+    triggered_id = ctx.triggered_id
+    if isinstance(triggered_id, dict):
+        return target_tab.get(triggered_id.get("index"), no_update)
+    return no_update
 
 
 # Data tab - KPIs
@@ -31,12 +62,29 @@ def update_demand_kpis(selected_ba):
     if pd.isna(row["first_period"]):
         return "No data", "No data"
 
-    first = pd.to_datetime(row["first_period"]).strftime("%b %d, %Y")
-    last = pd.to_datetime(row["last_period"]).strftime("%b %d, %Y")
+    first = (
+        pd.to_datetime(row["first_period"], utc=True)
+        .tz_convert("America/Chicago")
+        .strftime("%b %d, %Y")
+    )
+    last = (
+        pd.to_datetime(row["last_period"], utc=True)
+        .tz_convert("America/Chicago")
+        .strftime("%b %d, %Y")
+    )
     total_mwh = float(row["total_mwh"])
     total_label = f"{total_mwh:,.0f} MWh"
 
     return f"{first} - {last}", total_label
+
+
+# Data tab - Selected table preview
+@callback(
+    Output(component_id="output-data-table-preview", component_property="children"),
+    Input(component_id="input-data-table-dropdown", component_property="value"),
+)
+def update_data_table_preview(selected_table):
+    return render_table(**DATA_TABLES[selected_table])
 
 
 # Data tab - Demand / Temp graph
@@ -76,27 +124,57 @@ def update_demand_time_line_graph(selected_ba):
     order by demand.period
     """
     df = extract_data(sql)
+    df["period"] = pd.to_datetime(df["period"], utc=True).dt.tz_convert(
+        "America/Chicago"
+    )
 
     ba = selected_ba if selected_ba else "All BAs (average)"
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Scatter(x=df["period"], y=df["demand_mwh"], name="Demand (MWh)"),
+        go.Scatter(
+            x=df["period"],
+            y=df["demand_mwh"],
+            name="Demand (MWh)",
+            line={"color": DATA_COLORS["blue"], "width": 2},
+        ),
         secondary_y=False,
     )
 
     fig.add_trace(
-        go.Scatter(x=df["period"], y=df["temp"], name="Temperature (°F)"),
+        go.Scatter(
+            x=df["period"],
+            y=df["temp"],
+            name="Temperature (°F)",
+            line={"color": DATA_COLORS["orange"], "width": 2},
+        ),
         secondary_y=True,
     )
 
-    fig.update_xaxes(title_text="Time")
-    fig.update_yaxes(title_text="Demand (MWh)", secondary_y=False)
-    fig.update_yaxes(title_text="Temperature (°F)", secondary_y=True, showgrid=False)
+    fig.update_xaxes(title_text="Time", **PLOTLY_AXIS_STYLE)
+    fig.update_yaxes(
+        title_text="Demand (MWh)",
+        secondary_y=False,
+        **PLOTLY_AXIS_STYLE,
+    )
+    fig.update_yaxes(
+        title_text="Temperature (°F)",
+        secondary_y=True,
+        showgrid=False,
+        **PLOTLY_AXIS_STYLE,
+    )
     fig.update_layout(
-        title=f"Demand & Temp Over Time - {ba}",
-        hovermode="x unified",
-        legend={"orientation": "h", "y": 1.1},
+        **{
+            **PLOTLY_LAYOUT_STYLE,
+            "title": f"Demand & Temp Over Time - {ba}",
+            "hovermode": "x unified",
+            "legend": {
+                **PLOTLY_LAYOUT_STYLE["legend"],
+                "orientation": "h",
+                "y": 1.1,
+                "x": 0.8,
+            },
+        },
     )
     return fig
 
@@ -148,9 +226,13 @@ def load_ba_metrics():
     """
     metrics = {
         "avg_demand_mwh": {"label": "Avg Demand (MWh)", "fmt": ",.0f", "unit": " MWh"},
-        "renewable_pct": {"label": "Renewable %", "fmt": ".1f", "unit": "%"},
+        "renewable_pct": {
+            "label": "Renewable Generation (%)",
+            "fmt": ".1f",
+            "unit": "%",
+        },
         "net_interchange_mwh": {
-            "label": "Net Interchange (MWh)",
+            "label": "Avg Net Interchange (MWh)",
             "fmt": ",.0f",
             "unit": " MWh",
         },
@@ -161,7 +243,7 @@ def load_ba_metrics():
 ba_metrics_df, ba_metrics = load_ba_metrics()
 
 
-# BA tab - BA KPIs
+# BA tab - KPIs
 @callback(
     Output(component_id="output-ba-kpi-metric-cleanest", component_property="children"),
     Output(component_id="output-ba-kpi-metric-demand", component_property="children"),
@@ -259,17 +341,19 @@ def update_ba_map(selected_metric):
         selected_metric, ascending=False
     )
     metric_settings = ba_metrics[selected_metric]
+    is_net = selected_metric == "net_interchange_mwh"
 
     df = df.assign(bubble_size=df[selected_metric].abs())
-    return px.scatter_geo(
+    fig = px.scatter_geo(
         df,
         lat="latitude",
         lon="longitude",
         size="bubble_size",
         size_max=40,
-        color=selected_metric if selected_metric == "net_interchange_mwh" else None,
-        color_continuous_scale="RdBu",
-        color_continuous_midpoint=0,
+        opacity=0.6,
+        color=selected_metric if is_net else None,
+        color_continuous_scale=["#fde2c4", DATA_COLORS["blue"]],
+        labels={selected_metric: metric_settings["label"]},
         hover_name="ba_name",
         hover_data={
             selected_metric: ":" + metric_settings["fmt"],
@@ -279,10 +363,39 @@ def update_ba_map(selected_metric):
         },
         scope="usa",
         title=f"BA Centroid Locations by {metric_settings["label"]}",
+        color_discrete_sequence=[DATA_COLORS["blue"]],
     )
+    fig.update_geos(
+        bgcolor="rgba(0,0,0,0)",
+        showocean=False,
+        showlakes=False,
+        showland=True,
+        landcolor=COLORS["border"],
+        showcountries=True,
+        countrycolor=COLORS["surface"],
+        showsubunits=True,
+        subunitcolor=COLORS["surface"],
+        subunitwidth=0.5,
+        showframe=False,
+    )
+    fig.update_traces(
+        marker={"line": {"width": 0.75, "color": COLORS["surface"]}},
+    )
+    fig.update_layout(
+        margin={"l": 0, "r": 0, "t": 60, "b": 70},
+        coloraxis_colorbar={
+            **BA_COLOR_BAR,
+            "title": {
+                "text": metric_settings["label"],
+                "side": "top",
+            },
+        },
+    )
+    fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    return fig
 
 
-# BA tab - BA bar
+# BA tab - BA bar chart
 @callback(
     Output(component_id="output-ba-metric-bar", component_property="figure"),
     Input(component_id="input-ba-metric-dropdown", component_property="value"),
@@ -295,7 +408,7 @@ def update_ba_bar_chart(selected_metric):
     )
     metric_settings = ba_metrics[selected_metric]
 
-    return px.bar(
+    fig = px.bar(
         df,
         x="ba_code",
         y=selected_metric,
@@ -306,10 +419,15 @@ def update_ba_bar_chart(selected_metric):
         },
         labels={"ba_code": "BA", selected_metric: metric_settings["label"]},
         title=f"Top 10 BAs by {metric_settings["label"]}",
+        color_discrete_sequence=[DATA_COLORS["blue"]],
     )
+    fig.update_xaxes(**PLOTLY_AXIS_STYLE)
+    fig.update_yaxes(**PLOTLY_AXIS_STYLE)
+    fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    return fig
 
 
-# Weather tab - Weather KPIs
+# Weather tab - KPIs
 @callback(
     Output(component_id="output-weather-kpi-temp", component_property="children"),
     Output(component_id="output-weather-kpi-balance", component_property="children"),
@@ -421,7 +539,7 @@ def update_weather_kpis(selected_ba):
     return avg_temp, balance_temp, balance_demand, avg_demand
 
 
-# Weather tab - Demand / temp scatter
+# Weather tab - Demand / Temp scatter
 @callback(
     Output("output-weather-demand-scatter", "figure"),
     Input("input-weather-ba-dropdown", "value"),
@@ -463,13 +581,16 @@ def update_weather_demand_scatter(selected_ba):
         order by demand.period;
         """
         df = extract_data(sql)
+        df["period"] = pd.to_datetime(df["period"], utc=True).dt.tz_convert(
+            "America/Chicago"
+        )
 
         fig.add_trace(
             go.Scattergl(
                 x=df["temp"],
                 y=df["demand_mwh"],
                 mode="markers",
-                marker={"opacity": 0.25, "size": 5, "color": "#636efa"},
+                marker={"opacity": 0.25, "size": 5, "color": DATA_COLORS["blue"]},
                 text=df["period"],
                 hovertemplate="%{text}<br>"
                 + "%{x:.1f}°F<br>"
@@ -489,7 +610,7 @@ def update_weather_demand_scatter(selected_ba):
                 x=trend["temp_bin"],
                 y=trend["median"],
                 mode="lines",
-                line={"color": "#EF553B", "width": 3},
+                line={"color": DATA_COLORS["blue"], "width": 3},
                 name="Median by Temperature",
             )
         )
@@ -538,7 +659,7 @@ def update_weather_demand_scatter(selected_ba):
                 mode="lines",
                 line={"width": 0},
                 fill="tonexty",
-                fillcolor="rgba(99,110,250,0.2)",
+                fillcolor=DATA_COLORS["blue_band"],
                 name="10-90th percentile",
                 hoverinfo="skip",
             )
@@ -548,7 +669,7 @@ def update_weather_demand_scatter(selected_ba):
                 x=df["temp_bin"],
                 y=df["median_index"],
                 mode="lines+markers",
-                line={"color": "#EF553B", "width": 3},
+                line={"color": DATA_COLORS["blue"], "width": 3},
                 customdata=df[["obs_hours", "n_bas"]],
                 hovertemplate="%{x}°F<br>"
                 + "Median Index: %{y:.2f}<br>"
@@ -558,17 +679,39 @@ def update_weather_demand_scatter(selected_ba):
                 name="Median Demand Index",
             )
         )
-        y_title = "Demand Index (1.0 = BA average)"
+        y_title = "Demand Index<br> (1.0 = BA average)"
 
+    balance_temp = update_weather_kpis(selected_ba)[1]
+    balance_temp_number = get_temp_balance_number(balance_temp)
+
+    if balance_temp_number is not None:
+        fig.add_vline(
+            x=balance_temp_number,
+            line_dash="dash",
+            line_color=DATA_COLORS["orange"],
+            annotation_text=f"  Balance {balance_temp}",
+            annotation_position="top right",
+            annotation_font_color=DATA_COLORS["orange"],
+        )
+
+    fig.update_xaxes(**PLOTLY_AXIS_STYLE)
+    fig.update_yaxes(**PLOTLY_AXIS_STYLE)
+    fig.update_layout(**PLOTLY_LAYOUT_STYLE)
     fig.update_layout(
         xaxis_title="Temperature (°F)",
         yaxis_title=y_title,
-        legend={"orientation": "h", "y": 1.08},
+        legend={
+            "orientation": "h",
+            "y": 1.1,
+            "x": 0.7,
+            "title": None,
+        },
+        title="Demand by Temperature",
     )
     return fig
 
 
-# Weather tab - Demand/Gen by weather code
+# Weather tab - Demand / Gen by weather code
 @callback(
     Output(component_id="output-weather-code-bar", component_property="figure"),
     Input(component_id="input-weather-ba-dropdown", component_property="value"),
@@ -617,31 +760,61 @@ def update_weather_code_bar(selected_ba):
     order by wcode.weather_code;
     """
     df = extract_data(sql)
-    return px.bar(
-        df.melt(
-            id_vars=["weather_code", "obs_hours"],
-            value_vars=["avg_demand_mwh", "avg_generation_mwh"],
-            var_name="Metric",
-            value_name="mwh",
-        ).sort_values(by="mwh"),
+    df = df.melt(
+        id_vars=["weather_code", "obs_hours"],
+        value_vars=["avg_demand_mwh", "avg_generation_mwh"],
+        var_name="Metric",
+        value_name="mwh",
+    ).sort_values(by="mwh")
+
+    df["Metric"] = df["Metric"].map(
+        {"avg_demand_mwh": "Avg Demand", "avg_generation_mwh": "Avg Generation"}
+    )
+
+    fig = px.bar(
+        df,
         x="weather_code",
         y="mwh",
         color="Metric",
         barmode="group",
+        color_discrete_map={
+            "Avg Demand": DATA_COLORS["blue"],
+            "Avg Generation": DATA_COLORS["green"],
+        },
         labels={
-            "weather_code": "Weather Code",
             "mwh": "MWh",
             "obs_hours": "Hours Observed",
-            "avg_demand_mwh": "Avg Demand",
-            "avg_generation_mwh": "Avg Generation",
         },
         hover_data=["obs_hours"],
     )
+    fig.update_xaxes(
+        categoryorder="total descending",
+        tickangle=-45,
+        title=None,
+        automargin=True,
+        **PLOTLY_AXIS_STYLE,
+    )
+    fig.update_yaxes(**PLOTLY_AXIS_STYLE)
+    fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    fig.update_layout(
+        title="Avg Generation & Demand by Weather",
+        legend={
+            "orientation": "h",
+            "y": 1.2,
+            "x": 0.68,
+            "title": None,
+        },
+    )
+    fig.update_layout(dragmode="pan")
+    fig.update_xaxes(range=[-0.5, 8.5])
+    fig.update_yaxes(fixedrange=True)
+    return fig
 
 
 # Weather tab - Renewables scatter
 @callback(
-    Output("output-weather-renewables-scatter", "figure"),
+    Output("output-weather-wind-scatter", "figure"),
+    Output("output-weather-solar-scatter", "figure"),
     Input("input-weather-ba-dropdown", "value"),
 )
 def update_weather_renewables_scatter(selected_ba):
@@ -700,52 +873,48 @@ def update_weather_renewables_scatter(selected_ba):
     wind = df.dropna(subset=["wind_value"]).query("wind_value >= 0")
     solar = df.dropna(subset=["solar_value"]).query("solar_value > 0")
 
-    fig = make_subplots(
-        rows=1,
-        cols=2,
-        subplot_titles=(
-            "Wind Generation vs 120m Wind Speed",
-            "Solar Generation vs Cloud Cover",
-        ),
+    wind_fig = go.Figure(
+        data=[
+            go.Scattergl(
+                x=wind["wind_speed"],
+                y=wind["wind_value"],
+                mode="markers",
+                text=wind["period"],
+                hovertemplate=(
+                    "%{text}<br>"
+                    + "Wind Speed: %{x:.1f}<br>"
+                    + "Wind Value: %{y:.2f}"
+                    + "<extra></extra>"
+                ),
+                marker={"opacity": 0.25, "color": DATA_COLORS["green"]},
+                showlegend=False,
+            )
+        ]
     )
-    fig.add_trace(
-        go.Scattergl(
-            x=wind["wind_speed"],
-            y=wind["wind_value"],
-            mode="markers",
-            text=wind["period"],
-            hovertemplate=(
-                "%{text}<br>"
-                + "Wind Speed: %{x:.1f}<br>"
-                + "Wind Value: %{y:.2f}"
-                + "<extra></extra>"
-            ),
-            marker={"opacity": 0.3},
-            showlegend=False,
-        ),
-        row=1,
-        col=1,
+    solar_fig = go.Figure(
+        data=[
+            go.Scattergl(
+                x=solar["cloud_cover"],
+                y=solar["solar_value"],
+                mode="markers",
+                text=solar["period"],
+                hovertemplate=(
+                    "%{text}<br>"
+                    + "Cloud Cover: %{x:.1f}%<br>"
+                    + "Solar Value: %{y:.2f}"
+                    + "<extra></extra>"
+                ),
+                marker={"opacity": 0.25, "color": DATA_COLORS["green"]},
+                showlegend=False,
+            )
+        ]
     )
-    fig.add_trace(
-        go.Scattergl(
-            x=solar["cloud_cover"],
-            y=solar["solar_value"],
-            mode="markers",
-            text=solar["period"],
-            hovertemplate=(
-                "%{text}<br>"
-                + "Cloud Cover: %{x:.1f}%<br>"
-                + "Solar Value: %{y:.2f}"
-                + "<extra></extra>"
-            ),
-            marker={"opacity": 0.3},
-            showlegend=False,
-        ),
-        row=1,
-        col=2,
-    )
-    fig.update_xaxes(title_text="Wind Speed (120m)", row=1, col=1)
-    fig.update_xaxes(title_text="Cloud Cover (%)", row=1, col=2)
-    fig.update_yaxes(title_text=wind_title, row=1, col=1)
-    fig.update_yaxes(title_text=solar_title, row=1, col=2)
-    return fig
+    wind_fig.update_xaxes(title_text="Wind Speed (120m)", **PLOTLY_AXIS_STYLE)
+    wind_fig.update_yaxes(title_text=wind_title, **PLOTLY_AXIS_STYLE)
+    wind_fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    wind_fig.update_layout(title="Wind Generation by Wind Speed")
+    solar_fig.update_xaxes(title_text="Cloud Cover (%)", **PLOTLY_AXIS_STYLE)
+    solar_fig.update_yaxes(title_text=solar_title, **PLOTLY_AXIS_STYLE)
+    solar_fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    solar_fig.update_layout(title="Solar Generation by Cloud Cover")
+    return wind_fig, solar_fig

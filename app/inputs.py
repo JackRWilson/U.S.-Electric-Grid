@@ -1,8 +1,11 @@
 from dash import dcc
+from styles import DROPDOWN_STYLE
+from tables import DATA_TABLES
+
 from data import extract_data
 
 
-# Data tab
+# Data tab - BA dropdown
 def data_ba_dropdown():
     sql = """
     select distinct ba_code 
@@ -15,7 +18,25 @@ def data_ba_dropdown():
         id="input-data-ba-dropdown",
         multi=False,
         placeholder="All BAs",
-        style={"width": "250px"},
+        style={**DROPDOWN_STYLE, "width": "100%"},
+    )
+
+
+# Data tab - Table dropdown
+def data_table_dropdown():
+    return dcc.Dropdown(
+        [
+            {"label": config["table"], "value": key}
+            for key, config in DATA_TABLES.items()
+        ],
+        id="input-data-table-dropdown",
+        value=next(iter(DATA_TABLES)),
+        clearable=False,
+        searchable=True,
+        style={
+            **DROPDOWN_STYLE,
+            "width": "100%",
+        },
     )
 
 
@@ -35,11 +56,11 @@ def ba_metric_dropdown():
         id="input-ba-metric-dropdown",
         value="avg_demand_mwh",
         clearable=False,
-        style={"width": "250px"},
+        style={**DROPDOWN_STYLE, "width": "100%"},
     )
 
 
-# Data tab
+# Weather tab
 def weather_ba_dropdown():
     sql = """
     select distinct ba_code 
@@ -57,5 +78,5 @@ def weather_ba_dropdown():
         id="input-weather-ba-dropdown",
         multi=False,
         placeholder="All BAs",
-        style={"width": "250px"},
+        style={**DROPDOWN_STYLE, "width": "100%"},
     )

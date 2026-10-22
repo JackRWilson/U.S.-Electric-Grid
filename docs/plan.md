@@ -134,8 +134,9 @@ Project process is as follows (subject to change)
 | Create weather section | 4 hrs | 5 hrs |
 | Create prediction section | 5 hrs | |
 | Create income/population section | 3 hr | 3:30 hrs |
+| App styling | 3 hrs | 16:40 hrs |
 | App final touches | 2 hr | |
-| Total | 26:30 hrs | |
+| Total | 29:30 hrs | |
 
 ## Machine Learning (if time)
 
