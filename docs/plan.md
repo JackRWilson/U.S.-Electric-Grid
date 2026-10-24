@@ -132,7 +132,6 @@ Project process is as follows (subject to change)
 | Create national picture section | 2 hrs | 1:10 hrs |
 | Create ba section | 4 hrs | 2:15 hrs |
 | Create weather section | 4 hrs | 5 hrs |
-| Create prediction section | 5 hrs | |
 | Create income/population section | 3 hr | 3:30 hrs |
 | App styling | 3 hrs | 16:40 hrs |
 | App final touches | 2 hr | |
@@ -143,17 +142,17 @@ Project process is as follows (subject to change)
 ## Report (MD)
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Overview section | 1:30 hrs | |
-| Questions / hypothesis section | 15 min | |
-| Data description section | 30 min | |
-| Tools used section | 15 min | |
-| EDA / Analysis section | 2 hr | |
-| App section | 30 min | |
-| ETL diagram / Process section | 30 min | |
-| Conclusion section | 30 min | |
-| Sources section | 15 min | |
-| Polish GitHub README | 1 hr | |
-| Total | 7:15 hrs | |
+| Overview section | 1:30 hrs | 2 hrs |
+| Questions / hypothesis section | 15 min | 10 min |
+| Data description section | 30 min | 15 min |
+| Tools used section | 15 min | 5 min |
+| EDA / Analysis section | 2 hr | 2:25 hrs |
+| App section | 30 min | 30 min |
+| ETL diagram / Process section | 30 min | 10 min |
+| Conclusion section | 30 min | 15 min |
+| Sources section | 15 min | 10 min |
+| Polish GitHub README | 1 hr | 1 hr |
+| Total | 7:15 hrs | 7 hrs |
 
 ## PowerPoint
 | Task | Est. Time | Act. Time |

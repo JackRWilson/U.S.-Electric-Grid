@@ -16,3 +16,6 @@ data/CAINC1__ALL_AREAS_1969_2024.csv
 # Dev/Testing
 /notebooks
 /docs/logs.txt
+
+# Report
+/docs/assets/
