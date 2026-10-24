@@ -56,7 +56,9 @@ into a PostgreSQL database, and visualizes the results in an interactive dashboa
 │  ├─ electricity_schema.sql # Run database schema
 │  └─ ...
 ├─ docs/
-│  └─ plan.md
+│  ├─ plan.md
+│  ├─ report.md # Report
+│  └─ ...
 ├─ src/
 │  └─ electricity/
 │     ├─ main.py # Run pipeline
@@ -64,7 +66,7 @@ into a PostgreSQL database, and visualizes the results in an interactive dashboa
 ├─ .env.example
 ├─ .gitignore
 ├─ compose.yaml
-├─ README.md
+├─ README.md # You are HERE
 └─ requirements.txt # Install for pipeline
 ```
 
