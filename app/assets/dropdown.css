@@ -1,0 +1,46 @@
+.dash-dropdown {
+    background-color: #212121;
+    border-color: #3C3C3C;
+    color: #FFFFFF;
+}
+
+.dash-dropdown:focus {
+    border-color: #3794FF;
+    outline-color: #3794FF;
+}
+
+.dash-dropdown-value,
+.dash-dropdown-value-item {
+    color: #FFFFFF;
+}
+
+.dash-dropdown-placeholder {
+    color: #9DA5B4;
+}
+
+.dash-dropdown-content {
+    background-color: #212121;
+    border-color: #3C3C3C;
+    color: #FFFFFF;
+}
+
+.dash-dropdown-search-container {
+    background-color: #212121;
+    border-color: #3C3C3C;
+}
+
+.dash-dropdown-search {
+    color: #FFFFFF;
+}
+
+.dash-dropdown-option {
+    background-color: #212121;
+    color: #FFFFFF;
+}
+
+.dash-dropdown-option.selected,
+.dash-dropdown-option:not(:has(input[disabled])):hover,
+.dash-dropdown-option:not(:has(input[disabled])):focus-within {
+    background-color: #3794FF;
+    color: #FFFFFF;
+}

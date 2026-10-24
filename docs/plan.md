@@ -125,15 +125,18 @@ Project process is as follows (subject to change)
 ## App
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Sketch up possible app view | 1 hr | |
-| Load data tables in | 3 hrs | |
-| Create electricity generation section | 2 hrs | |
-| Create electricty demand section | 2 hr | |
-| Create weather section | 2 hr | |
-| Create population section | 1 hr | |
-| Create income section | 1 hr | |
+| Sketch up possible app view | 1 hr | 2:55 hrs |
+| Create overview section | 30 min | 30 min |
+| Create data section | 3 hrs | 3:40 hrs |
+| Create pipeline section | 2 hrs | 2:55 hrs |
+| Create national picture section | 2 hrs | 1:10 hrs |
+| Create ba section | 4 hrs | 2:15 hrs |
+| Create weather section | 4 hrs | 5 hrs |
+| Create prediction section | 5 hrs | |
+| Create income/population section | 3 hr | 3:30 hrs |
+| App styling | 3 hrs | 16:40 hrs |
 | App final touches | 2 hr | |
-| Total | 14 hrs | |
+| Total | 29:30 hrs | |
 
 ## Machine Learning (if time)
 
