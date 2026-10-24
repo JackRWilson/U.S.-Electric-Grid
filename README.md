@@ -3,11 +3,11 @@
 A data-driven analysis on U.S. electricity demand and generation, and how weather, geography, population, and income relate to energy use.
 
 The project pulls hourly electricity data from the EIA API and weather data from Open-Meteo, combines them with static datasets (population, income, balancing authority information, etc.), loads everything
-into a PostgresSQL database, and visualizes the results in an interactive dashboard. The pipeline is orchestrated with Apache Airflow and runs hourly.
+into a PostgreSQL database, and visualizes the results in an interactive dashboard. The pipeline is orchestrated with Apache Airflow and runs hourly.
 
 ![Dashboard screenshot](docs/dashboard.png)
 
-> **This is an overview. A full written report and presentation can be found in** `docs/`.
+> ### This is an overview. A full written report can be found [here](docs/report.md).
 
 ---
 
@@ -15,27 +15,27 @@ into a PostgresSQL database, and visualizes the results in an interactive dashbo
 
 | Question | Takeaways |
 | ----- | ----- |
-| 1. How does demand and generation vary by area? | PJM has the highest average demand among the mapped authorities. Its large service area is important context for that total. |
-| 2. How does weather affect demand, generation, and renewables? | Demand has an estimated balance point of 50°F. Wind and cloud conditions show slight correlation with renewable generation. |
-| 3. Can weather help predict electricity use? | Demand varies with temperature, making forecasting useful. A historical relationship alone does not validate a forecast model. |
+| 1. How does demand and generation vary by area? | Total demand and generation scale with BA size. Normalized demand is consistent across BAs, and most demand more than they generate. |
+| 2. How does weather affect demand, generation, and renewables? | Demand follows temperature and has an estimated balance point of 50°F. Wind and cloud conditions show slight correlation with renewable generation. |
+| 3. Can weather help predict electricity use? | Demand varies with temperature, making forecasting useful. However, demand does not significantly vary with weather condition. |
 | 4. Does population affect electricity use? | There is little relationship between BA population estimates and demand per person. |
 | 5. Do higher income areas use more electricity? | There is little relationship between estimated income and demand per person. |
 
 ---
 
 ## Tools
-| Structure | Tools |
+| Category | Tools |
 | ----- | ----- |
 | Language | Python, SQL |
 | APIs | EIA API, Open-Mateo API |
-| Database | PostgresSQL, DBeaver |
+| Database | PostgreSQL, DBeaver |
 | Orchestration | Apache Airflow | 
 | Dashboard | Dash, Plotly |
 
 ---
 
 ## Project Structure
-```python
+```bash
 .
 ├─ airflow/
 │  ├─ requirements.txt
@@ -72,6 +72,8 @@ into a PostgresSQL database, and visualizes the results in an interactive dashbo
 
 ## Set Up
 
+### Prerequisites
+
 - Python
 - Free [EIA API Key](https://www.eia.gov/opendata/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (optional, Airflow Route)
@@ -83,11 +85,11 @@ Download the files below and place them in the `data/` folder.
 
 | File | Status | Source | Notes |
 | ----- | :-----: | :-----: | -----: |
-| `2___Plant_Y2025.xlsx`| Required | [link](https://www.eia.gov/electricity/data/eia860/xls/eia8602025.zip) | Only pull "2___Plant_Y2025.xlsx" |
-| `CAINC1_ALL_AREAS_1969_2024.csv` | Required | [link](https://apps.bea.gov/regional/zip/CAINC1.zip) | Only pull "CAINC1_ALL_AREAS_1969_2024.csv" |
+| `2___Plant_Y2025.xlsx`| Required | [link](https://www.eia.gov/electricity/data/eia860/xls/eia8602025.zip) | Only pull `2___Plant_Y2025.xlsx` from the zip |
+| `CAINC1_ALL_AREAS_1969_2024.csv` | Required | [link](https://apps.bea.gov/regional/zip/CAINC1.zip) | Only pull `CAINC1_ALL_AREAS_1969_2024.csv` from the zip |
 | `sub-est2025.csv` | Required | [link](https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/cities/totals/sub-est2025.csv)| |
 | `2020_Gaz_counties_national.txt` | Only if missing | [link](https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_counties_national.zip) | |
-| `Balancing_Authority_2025.xlsx` | Only if missing | [link](https://www.eia.gov/electricity/data/eia861/zip/f8612025.zip) | Only pull "Balancing_Authority_2025.xlsx" |
+| `Balancing_Authority_2025.xlsx` | Only if missing | [link](https://www.eia.gov/electricity/data/eia861/zip/f8612025.zip) | Only pull `Balancing_Authority_2025.xlsx` from the zip |
 | `out_eia861__yearly_balancing_authority_service_territory.parquet` | Only if missing | [link](https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/out_eia861__yearly_balancing_authority_service_territory.parquet) | |
 
 ### 2. Configure environment variables
@@ -173,13 +175,15 @@ pip install -r requirements.txt
 
 4. Create the schema by running `db/electricity_schema.sql` in DBeaver.
 
-5. Run pipeline.
+5. Run pipeline [from file](/src/electricity/main.py) or...
 
 ```powershell
 python src/electricity/main.py
 ```
 
 ### 4. Run the dashboard
+
+[Run from file](/app/main.py) or...
 
 ```powershell
 cd app
