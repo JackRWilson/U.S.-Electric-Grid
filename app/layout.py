@@ -123,7 +123,7 @@ def layout():
                         [
                             html.H1("Overview"),
                             html.P("""
-                                A data-driven analysis at U.S. electricity demand and generation, and how weather, 
+                                A data-driven analysis on U.S. electricity demand and generation, and how weather, 
                                 geography, population, and income relate to energy use.
                                 """),
                         ],
@@ -186,22 +186,22 @@ def layout():
                     html.Div(
                         [
                             overview_question(
-                                "Can weather help predict electricity use?",
-                                "Demand varies with temperature, making forecasting useful. A historical relationship alone does not validate a forecast model.",
-                                "Explore Weather",
-                                "weather-forecast",
-                            ),
-                            overview_question(
                                 "How does demand and generation vary by area?",
-                                "PJM has the highest average demand among the mapped authorities. Its large service area is important context for that total.",
+                                "Total demand and generation scale with BA size. Normalized demand is consistent across BAs, and most demand more than they generate.",
                                 "Explore Balancing Authorities",
                                 "ba-area",
                             ),
                             overview_question(
                                 "How does weather affect demand and renewables?",
-                                "Demand has an estimated balance point of 50°F. Wind and cloud conditions show slight correlation with renewable generation.",
+                                "Demand follows temperature and has an estimated balance point of 50°F. Wind and cloud conditions show slight correlation with renewable generation.",
                                 "Explore Weather",
                                 "weather-renewables",
+                            ),
+                            overview_question(
+                                "Can weather help predict electricity use?",
+                                "Demand varies with temperature, making forecasting useful. However, demand does not significantly vary with weather condition.",
+                                "Explore Weather",
+                                "weather-forecast",
                             ),
                             overview_question(
                                 "Does population affect electricity use?",
@@ -236,6 +236,14 @@ def layout():
                                 Temperatures are in Fahrenheit. Demand, generation, and interchange are shown in
                                 megawatt-hours (MWh). Database periods are stored in UTC/GMT and displayed in 
                                 Central time where applicable.
+                                """,
+                                style=CARD_BODY_STYLE,
+                            ),
+                            html.P(
+                                """
+                                Mega-watt hour (MWh) is a unit of electric measurement. 1 MWh is a massive block 
+                                of energy. With it, you can: power the average U.S. home for 1.2 months, drive an
+                                electric car 3,600 miles (U.S. coast to coast), or run 2 refrigerators for a year.
                                 """,
                                 style=CARD_BODY_STYLE,
                             ),
@@ -381,13 +389,6 @@ def layout():
                             html.P(
                                 "Data sources are documented in the project README.",
                                 style={"margin": "0"},
-                            ),
-                            html.A(
-                                "View Sources & Project Repository",
-                                href="https://github.com/JackRWilson/Capstone",
-                                target="_blank",
-                                rel="noreferrer",
-                                style=DATA_LINK_STYLE,
                             ),
                             html.A(
                                 "View Database Schema",
@@ -630,8 +631,10 @@ def layout():
                         [
                             html.H1("Balancing Authorities"),
                             html.P("""
-                                There are large differences between each BA in terms of average demand,
-                                clean fuel sources, and demand vs generation. 
+                                Compare how BAs stack up against each other using metrics such
+                                as average demand, peak-to-average demand (normalized demand metric), 
+                                renewable generation percentage, and interchange percent (0% = 
+                                generate as much as demand, 100% = only generation).
                                 """),
                         ],
                         style=INTRO_CARD_STYLE,
@@ -800,20 +803,6 @@ def layout():
         ],
     )
 
-    # demand_pred_tab = dcc.Tab(
-    #     label="Demand Prediction",
-    #     style=tab_style,
-    #     selected_style=tab_selected_style,
-    #     children=[
-    #         html.Section(
-    #             [
-    #                 html.H1("Demand Prediction"),
-    #                 html.P("""Build a small forecast model if time"""),
-    #             ]
-    #         )
-    #     ],
-    # )
-
     pop_inc_kpi_values = pop_inc_kpis()
     pop_income_tab = dcc.Tab(
         label="Population & Income",
@@ -836,18 +825,6 @@ def layout():
                     html.Section(
                         [
                             kpi_card(
-                                "Income R²",
-                                value=pop_inc_kpi_values[0],
-                                card_style=KPI_CARD_STYLE,
-                                label_style=KPI_LABEL_STYLE,
-                            ),
-                            kpi_card(
-                                "Demand Change per +$10,000 Income",
-                                value=pop_inc_kpi_values[2],
-                                card_style=KPI_CARD_STYLE,
-                                label_style=KPI_LABEL_STYLE,
-                            ),
-                            kpi_card(
                                 "Population R²",
                                 value=pop_inc_kpi_values[1],
                                 card_style=KPI_CARD_STYLE,
@@ -859,6 +836,18 @@ def layout():
                                 card_style=KPI_CARD_STYLE,
                                 label_style=KPI_LABEL_STYLE,
                             ),
+                            kpi_card(
+                                "Income R²",
+                                value=pop_inc_kpi_values[0],
+                                card_style=KPI_CARD_STYLE,
+                                label_style=KPI_LABEL_STYLE,
+                            ),
+                            kpi_card(
+                                "Demand Change per +$10,000 Income",
+                                value=pop_inc_kpi_values[2],
+                                card_style=KPI_CARD_STYLE,
+                                label_style=KPI_LABEL_STYLE,
+                            ),
                         ],
                         style=KPI_GRID_STYLE,
                     ),
@@ -866,7 +855,7 @@ def layout():
                         [
                             html.Div(
                                 dcc.Graph(
-                                    figure=pop_inc_demand_inc_scatter(),
+                                    figure=pop_inc_demand_pop_scatter(),
                                     config={"responsive": True},
                                     style=GRAPH_STYLE,
                                 ),
@@ -874,7 +863,7 @@ def layout():
                             ),
                             html.Div(
                                 dcc.Graph(
-                                    figure=pop_inc_demand_pop_scatter(),
+                                    figure=pop_inc_demand_inc_scatter(),
                                     config={"responsive": True},
                                     style=GRAPH_STYLE,
                                 ),
@@ -913,7 +902,6 @@ def layout():
                     national_pic_tab,
                     ba_tab,
                     weather_tab,
-                    # demand_pred_tab,
                     pop_income_tab,
                 ],
             ),

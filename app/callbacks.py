@@ -186,6 +186,7 @@ def load_ba_metrics():
         select
             ba_id,
             avg(demand_mwh) as avg_demand_mwh,
+            percentile_cont(0.98) within group (order by demand_mwh) as peak_demand_mwh,
             avg(total_interchange_mwh) as net_interchange_mwh
         from electric_demand
         group by ba_id
@@ -214,7 +215,9 @@ def load_ba_metrics():
         ba.ba_code,
         ba.ba_name,
         d.avg_demand_mwh,
+        d.peak_demand_mwh / nullif(d.avg_demand_mwh, 0) as demand_index,
         d.net_interchange_mwh,
+        100.0 * d.net_interchange_mwh / nullif(greatest(d.avg_demand_mwh, g.avg_generation_mwh), 0) as net_interchange_pct,
         g.avg_generation_mwh,
         g.renewable_pct,
         l.latitude,
@@ -225,16 +228,30 @@ def load_ba_metrics():
     join location l on l.ba_id = ba.ba_id
     """
     metrics = {
-        "avg_demand_mwh": {"label": "Avg Demand (MWh)", "fmt": ",.0f", "unit": " MWh"},
+        "avg_demand_mwh": {
+            "label": "Avg Demand (MWh)",
+            "fmt": ",.0f",
+            "unit": " MWh",
+        },
+        "demand_index": {
+            "label": "Peak-to-Avg Demand",
+            "fmt": ".2f",
+            "unit": "x",
+        },
+        "avg_generation_mwh": {
+            "label": "Avg Generation (MWh)",
+            "fmt": ",.0f",
+            "unit": " MWh",
+        },
         "renewable_pct": {
             "label": "Renewable Generation (%)",
             "fmt": ".1f",
             "unit": "%",
         },
-        "net_interchange_mwh": {
-            "label": "Avg Net Interchange (MWh)",
-            "fmt": ",.0f",
-            "unit": " MWh",
+        "net_interchange_pct": {
+            "label": "Net Interchange (% of Demand)",
+            "fmt": ".1f",
+            "unit": "%",
         },
     }
     return extract_data(sql), metrics
@@ -341,7 +358,7 @@ def update_ba_map(selected_metric):
         selected_metric, ascending=False
     )
     metric_settings = ba_metrics[selected_metric]
-    is_net = selected_metric == "net_interchange_mwh"
+    is_net = selected_metric == "net_interchange_pct"
 
     df = df.assign(bubble_size=df[selected_metric].abs())
     fig = px.scatter_geo(

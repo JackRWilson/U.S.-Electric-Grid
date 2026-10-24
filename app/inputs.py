@@ -43,12 +43,30 @@ def data_table_dropdown():
 # BA tab
 def ba_metric_dropdown():
     metrics = {
-        "avg_demand_mwh": {"label": "Avg demand (MWh)", "fmt": ",.0f", "unit": " MWh"},
-        "renewable_pct": {"label": "Renewable %", "fmt": ".1f", "unit": "%"},
-        "net_interchange_mwh": {
-            "label": "Net interchange (MWh)",
+        "avg_demand_mwh": {
+            "label": "Avg Demand (MWh)",
             "fmt": ",.0f",
             "unit": " MWh",
+        },
+        "demand_index": {
+            "label": "Peak-to-Avg Demand",
+            "fmt": ".2f",
+            "unit": "x",
+        },
+        "avg_generation_mwh": {
+            "label": "Avg Generation (MWh)",
+            "fmt": ",.0f",
+            "unit": " MWh",
+        },
+        "renewable_pct": {
+            "label": "Renewable Generation (%)",
+            "fmt": ".1f",
+            "unit": "%",
+        },
+        "net_interchange_pct": {
+            "label": "Net Interchange (% of Demand)",
+            "fmt": ".1f",
+            "unit": "%",
         },
     }
     return dcc.Dropdown(
