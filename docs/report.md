@@ -115,7 +115,7 @@ Income is similar. Its trend line is also fairly flat with an R² of 0.03, meani
 
 ## Next Steps
 
-- Analyze precipitation, rain, snow, and wind speed in relation to generation.
+- Analyze precipitation, rain, and snow in relation to generation.
 - Add solar UV data and examine its relationship with solar generation.
 - Expand coverage and compare electricity use and generation across more regions.
 
