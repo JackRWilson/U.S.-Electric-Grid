@@ -481,7 +481,7 @@ def layout():
                                     html.Div(
                                         [
                                             html.H3(
-                                                "Balancing Authority Location Weight (e.g. AECI)",
+                                                "Balancing Authority Location Weight (e.g. Associated Electric Cooperative, Inc. - AECI)",
                                                 style=CARD_TITLE_STYLE,
                                             ),
                                             html.P(

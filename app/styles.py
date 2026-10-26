@@ -428,7 +428,7 @@ PIPELINE_IMAGE_STYLE = {
 
 PIPELINE_DIAGRAM_IMAGE_STYLE = {
     **PIPELINE_IMAGE_STYLE,
-    "maxHeight": "180px",
+    "maxHeight": "200px",
 }
 
 ERD_IMAGE_STYLE = {

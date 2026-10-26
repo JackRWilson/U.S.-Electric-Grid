@@ -277,15 +277,33 @@ def nat_pic_kpis():
 # National picture tab - Demand graph
 def nat_pic_demand_line_graph():
     sql = f"""
-    with {LATEST_COMPLETE_PERIOD_CTE}
-    select 
-        period, 
-        sum(demand_mwh) as total_mwh
-    from electric_demand
-    where period between
-        (select period - interval '14 days' from latest_complete_period)
-        and (select period from latest_complete_period)
-    group by period
+    with {LATEST_COMPLETE_PERIOD_CTE},
+    demand as (
+        select
+            ed.period,
+            sum(ed.demand_mwh) as total_demand_mwh
+        from electric_demand ed
+        where ed.period between
+            (select period - interval '14 days' from latest_complete_period)
+            and (select period from latest_complete_period)
+        group by ed.period
+    ),
+    generation as (
+        select
+            eg.period,
+            sum(eg.generation_mwh) as total_generation_mwh
+        from electric_generation eg
+        where eg.period between
+            (select period - interval '14 days' from latest_complete_period)
+            and (select period from latest_complete_period)
+        group by eg.period
+    )
+    select
+        coalesce(d.period, g.period) as period,
+        d.total_demand_mwh,
+        g.total_generation_mwh
+    from demand d
+    full outer join generation g on g.period = d.period
     order by period;
     """
     df = extract_data(sql)
@@ -293,16 +311,37 @@ def nat_pic_demand_line_graph():
         "America/Chicago"
     )
 
+    series_labels = {
+        "total_demand_mwh": "Demand",
+        "total_generation_mwh": "Generation",
+    }
+    df = df.melt(
+        id_vars="period",
+        value_vars=list(series_labels),
+        var_name="series",
+        value_name="total_mwh",
+    )
+    df["series"] = df["series"].map(series_labels)
     fig = px.line(
         df,
         x="period",
         y="total_mwh",
-        labels={"period": "Time", "total_mwh": "Total Demand (MWh)"},
-        title="Demand (Last 14 Days)",
-        color_discrete_sequence=[DATA_COLORS["blue"]],
+        color="series",
+        labels={"period": "Time", "total_mwh": "Total (MWh)", "series": ""},
+        title="Demand vs Generation (Last 14 Days)",
+        color_discrete_sequence=[DATA_COLORS["blue"], DATA_COLORS["green"]],
+        category_orders={"series": ["Demand", "Generation"]},
     )
     fig.update_xaxes(**PLOTLY_AXIS_STYLE)
     fig.update_layout(**PLOTLY_LAYOUT_STYLE)
+    fig.update_layout(
+        legend={
+            "orientation": "h",
+            "y": 1.07,
+            "x": 0.75,
+            "title": None,
+        },
+    )
     return fig
 
 
