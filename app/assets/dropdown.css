@@ -38,6 +38,18 @@
     color: #FFFFFF;
 }
 
+.dash-dropdown-trigger-icon {
+    color: #9DA5B4;
+}
+
+.dash-dropdown-clear {
+    color: #9DA5B4;
+}
+
+.dash-dropdown-clear:hover {
+    color: #3794FF;
+}
+
 .dash-dropdown-option.selected,
 .dash-dropdown-option:not(:has(input[disabled])):hover,
 .dash-dropdown-option:not(:has(input[disabled])):focus-within {
