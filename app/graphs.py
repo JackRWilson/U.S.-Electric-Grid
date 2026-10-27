@@ -328,7 +328,7 @@ def nat_pic_demand_line_graph():
         y="total_mwh",
         color="series",
         labels={"period": "Time", "total_mwh": "Total (MWh)", "series": ""},
-        title="Demand vs Generation (Last 14 Days)",
+        title="Demand & Generation (Last 14 Days)",
         color_discrete_sequence=[DATA_COLORS["blue"], DATA_COLORS["green"]],
         category_orders={"series": ["Demand", "Generation"]},
     )
