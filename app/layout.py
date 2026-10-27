@@ -77,6 +77,8 @@ from data import (
 
 
 def layout():
+    QUESTIONS = False
+
     overview_header_tab = dcc.Tab(
         label="Overview",
         disabled=True,
@@ -284,10 +286,10 @@ def layout():
                             html.Ul(
                                 [
                                     html.Li(
-                                        "Analyze precipitation, rain, snow, and wind speed in relation to generation."
+                                        "Analyze precipitation, rain, snow, and UV in relation to renewable generation."
                                     ),
                                     html.Li(
-                                        "Add solar UV data and examine its relationship with solar generation."
+                                        "Build a temperature-based demand prediction model and see how well of a predictor it really is."
                                     ),
                                     html.Li(
                                         "Expand coverage and compare electricity use and generation across more regions."
@@ -636,6 +638,9 @@ def layout():
                                 renewable generation percentage, and interchange percent (0% = 
                                 generate as much as demand, 100% = only generation).
                                 """),
+                            html.P("""
+                                Q1: How does demand and generation vary by area?
+                                """) if QUESTIONS else None,
                         ],
                         style=INTRO_CARD_STYLE,
                     ),
@@ -722,6 +727,9 @@ def layout():
                                 at the edge of the observed range are omitted because a minimum
                                 cannot reliably be identified.
                                 """),
+                            html.P("""
+                                Q2 & 3: How does weather affect demand, generation, and renewables? Can weather help predict electricity use?
+                                """) if QUESTIONS else None,
                         ],
                         style=INTRO_CARD_STYLE,
                     ),
@@ -819,6 +827,9 @@ def layout():
                                 Compare average hourly electricity demand per person (kW/person) across
                                 BAs against county population and per capita income.
                                 """),
+                            html.P("""
+                                Q 4 & 5: Does population affect electricity use? Do higher income areas use more electricity?
+                                """) if QUESTIONS else None,
                         ],
                         style=INTRO_CARD_STYLE,
                     ),
