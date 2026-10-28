@@ -185,8 +185,6 @@ python src/electricity/main.py
 
 ### 4. Run the dashboard
 
-[Run from file](/app/main.py) or...
-
 ```powershell
 cd app
 ```
@@ -194,6 +192,8 @@ cd app
 ```powershell
 pip install -r requirements.txt
 ```
+
+[Run from file](/app/main.py) or...
 
 ```powershell
 python main.py

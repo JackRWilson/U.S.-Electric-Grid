@@ -828,7 +828,7 @@ def layout():
                                 BAs against county population and per capita income.
                                 """),
                             html.P("""
-                                Q 4 & 5: Does population affect electricity use? Do higher income areas use more electricity?
+                                Q4 & 5: Does population affect electricity use? Do higher income areas use more electricity?
                                 """) if QUESTIONS else None,
                         ],
                         style=INTRO_CARD_STYLE,
