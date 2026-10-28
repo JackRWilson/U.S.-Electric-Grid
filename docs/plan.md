@@ -1,6 +1,7 @@
 # Overview
 This project analyses U.S. Energy generation and demand and how weather, population, and income play a role.
 
+> ### This file is for dev use and ideas. See [report](/docs/report.md) for a finalized report, or [README](/README.md) for setup instructions.
 
 # Data / Links
 U.S. Energy Information Administration
@@ -85,7 +86,7 @@ Project process is as follows (subject to change)
 | Collect all data sources | 1 hr | 1:30 hrs |
 | Create questions | 30 min | 10 min |
 | Create project plan | 1 hr | 30 min |
-| Total | 3:30 hrs | 3:40 hrs |
+| Total | 4:30 hrs | 3:40 hrs |
 
 ## ETL Prep
 | Task | Est. Time | Act. Time |
@@ -119,7 +120,7 @@ Project process is as follows (subject to change)
 ## Load
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Load transformed data into DB | 3 hrs | |
+| Load transformed data into DB | 3 hrs | 1:50 hrs |
 | Total | 3 hrs | 1:50 hrs |
 
 ## App
@@ -134,8 +135,8 @@ Project process is as follows (subject to change)
 | Create weather section | 4 hrs | 5 hrs |
 | Create income/population section | 3 hr | 3:30 hrs |
 | App styling | 3 hrs | 16:40 hrs |
-| App final touches | 2 hr | |
-| Total | 29:30 hrs | |
+| App final touches | 2 hr | 30 min |
+| Total | 29:30 hrs | 39:05 hrs |
 
 ## Machine Learning (if time)
 
@@ -157,17 +158,19 @@ Project process is as follows (subject to change)
 ## PowerPoint
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Overview section | 10 min | |
-| Questions / hypothesis section | 30 min | |
-| Data description section | 30 min | |
-| App / EDA section | 10 min | |
-| Technical challenges section | 30 min | |
-| Conclusion section | 30 min | |
-| Final touches | 30 min | |
-| Total | 2:50 hrs | |
+| Overview section | 10 min | 1 hr |
+| Questions / hypothesis section | 30 min | 10 min |
+| Data section | 30 min | 25 min |
+| ETL section | 30 min | 1 hr |
+| App section | 10 min | 20 min |
+| Conclusion section | 30 min | 15 min |
+| Limitations section | 30 min | 15 min |
+| Next steps section | 30 min | 10 min |
+| Final touches | 30 min | 1:35 hrs |
+| Total | 3:50 hrs | 5:10 hrs |
 
 ## Presentation
 | Task | Est. Time | Act. Time |
 | ---- | --------- | --------- |
-| Practice | 3 hrs | |
-| Total | 3 hrs | |
+| Practice | 3 hrs | 5 hrs |
+| Total | 3 hrs | 5 hrs |
